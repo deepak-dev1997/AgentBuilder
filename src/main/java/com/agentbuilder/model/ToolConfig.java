@@ -12,8 +12,23 @@ public class ToolConfig {
     private Map<String, String> headers;
     private String serverUrl;
     private Map<String,String> parameters;
-    private Map<Object,Object> requestBody;
+    private Map<String,String> requestBody;
     private String beforeTool;
     private String afterTool;
+
+
+    @Override
+    public String toString() {
+        return "ToolConfig{" +
+                "toolName='" + toolName + '\'' +
+                ", description='" + description + '\'' +
+                ", headers=" + headers +
+                ", serverUrl='" + serverUrl + '\'' +
+                ", parameters=" + parameters +
+                ", requestBody=" + requestBody +
+                ", beforeTool='" + beforeTool + '\'' +
+                ", afterTool='" + afterTool + '\'' +
+                '}';
+    }
 }
 

@@ -7,6 +7,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatResponse {
+    private String conversationId;
+    private String message;
 
     private String response;
 }
