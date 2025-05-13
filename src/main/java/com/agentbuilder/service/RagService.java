@@ -5,6 +5,7 @@ import com.agentbuilder.dtos.ChatRequest;
 import com.agentbuilder.dtos.openairequests.ChatCompletionDto;
 import com.agentbuilder.dtos.openairequests.ChatResponse;
 import com.agentbuilder.dtos.openairequests.Message;
+import com.agentbuilder.helper.Qna;
 import com.agentbuilder.model.*;
 
 import com.agentbuilder.repository.ConversationRepository;
@@ -103,6 +104,9 @@ public class RagService {
             for(int a =0;a<documents.size();a++ ){
             	
                 sb.append("source:"+documents.get(a).getDocumentContent()+"\n");
+            }
+            for(Qna qna : botConfig.getKnowledgeBase().getQnas()) {
+            	sb.append("source:\n question: "+ qna.getQuestion()+"\n Asnwer: "+qna.getAnswer()+"\n");
             }
             sb.append("these are the instructions given by user that you need to act as a : " +promptConfig.getRole()+"\n here are further commands "+ promptConfig.getSystemPrompt());
             List<Message> messages = new ArrayList<>();
