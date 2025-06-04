@@ -50,6 +50,9 @@
     <button id="tabBtn-prompt" onclick="showTab('promptTab')">Prompt Config</button>
     <button id="tabBtn-tools"  onclick="showTab('toolsTab')" >Tools</button>
     <button id="tabBtn-kb"     onclick="showTab('kbTab')"    >Knowledge Base</button>
+    <button id="tabBtn-chat" onclick="showTab('chatTab')">Socket-Based chat</button>
+	<button id="tabBtn-apiChat" onclick="showTab('apiChatTab')">API-Based Chat</button>
+
 </nav>
 
 <!-- ========= BOTS TAB ========= -->
@@ -138,6 +141,50 @@
     <table id="fileTable" style="margin-top:12px"><thead><tr><th>Name</th><th>Actions</th></tr></thead><tbody></tbody></table>
 </section>
 
+
+<!-- ===== Chat TAB ===== -->
+<section id="chatTab" class="tab">
+    <h2>Chat</h2>
+  
+    <!-- pick which bot to talk to -->
+    <div class="field">
+        <label>Select Bot</label>
+        <select id="chatBotSelect"></select>
+    </div>
+  
+    <!-- chat window -->
+    <div id="chatBox" style="height:320px;overflow-y:auto;
+                             border:1px solid #ddd;padding:10px;margin:10px 0;
+                             background:#fff;border-radius:var(--radius)"></div>
+  
+    <!-- composer -->
+    <div style="display:flex;gap:8px">
+        <input id="chatInput" style="flex:1" placeholder="Type a message…">
+        <button onclick="sendMsg()">➤</button>
+    </div>
+  </section>
+  
+  <!-- ========= API Chat TAB ========= -->
+  <section id="apiChatTab" class="tab">
+      <h2>API Chat</h2>
+
+      <div class="field">
+          <label>Select Bot</label>
+          <select id="apiChatBotSelect"></select>
+      </div>
+
+      <div id="apiChatBox" style="height:320px;overflow-y:auto;
+                                  border:1px solid #ddd;padding:10px;margin:10px 0;
+                                  background:#fff;border-radius:var(--radius)">
+      </div>
+
+      <div style="display:flex;gap:8px">
+          <input id="apiChatInput" style="flex:1" placeholder="Type a message…">
+          <button onclick="sendApiMsg()">➤</button>
+      </div>
+  </section>
+
+
 <!-- ========= BOT MODAL ========= -->
 <div id="botModal" class="modal">
     <div class="card">
@@ -174,6 +221,23 @@ let bots = [];
 let currentBot = null;              // for editing bot
 let editMode = false;               // bot modal state
 let currentTool = null;             // for editing tool
+let conversationId=0;
+
+
+document.getElementById('apiChatInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault(); // prevent newline in input
+        sendApiMsg();
+    }
+});
+
+
+document.getElementById('chatInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault(); // prevent newline in input
+        sendMsg();
+    }
+});
 
 /* ------ BASIC HELPERS ------ */
 function showTab(tabId){
@@ -183,6 +247,7 @@ function showTab(tabId){
     document.getElementById(tabId).style.display='block';
     if(tabId==='botsTab')loadBots();
     if(tabId==='kbTab')loadKbData();
+	
 }
 function openBotModal(bot){
     document.getElementById('botModal').style.display='flex';
@@ -248,6 +313,8 @@ async function loadBots(){
     fillBotDropdown('promptBotSelect');
     fillBotDropdown('toolsBotSelect');
     fillBotDropdown('kbBotSelect');
+    fillBotDropdown('chatBotSelect');
+	fillBotDropdown('apiChatBotSelect');
 }
 async function saveBot(){
     const name=document.getElementById('botNameInput').value.trim();
@@ -409,6 +476,82 @@ async function saveQna(){const bot=document.getElementById('kbBotSelect').value;
 async function deleteQna(idx){const bot=document.getElementById('kbBotSelect').value;if(!confirm('Delete QnA?'))return;await fetch(`/api/bots/${bot}/kb/qnas/${idx}`,{method:'DELETE'});loadKbData();}
 async function uploadKbFile(){const bot=document.getElementById('kbBotSelect').value;const fileInput=document.getElementById('kbFileInput');if(!bot||!fileInput.files.length){alert('Select bot and choose file');return;}const fd=new FormData();fd.append('file',fileInput.files[0]);await fetch(`/api/bots/${bot}/kb/files`,{method:'POST',body:fd});fileInput.value='';loadKbData();}
 async function deleteKbFile(fileId){const bot=document.getElementById('kbBotSelect').value;if(!confirm('Delete file?'))return;await fetch(`/api/bots/${bot}/kb/files/${fileId}`,{method:'DELETE'});loadKbData();}
+
+let ws=null;
+function connectSocket(){
+   if(ws){ws.close();}
+   ws = new WebSocket(`ws://localhost:8081/chat`);
+   ws.onopen   = ()=>console.log('✅ socket open');
+   ws.onclose  = ()=>console.log('❌ socket closed');
+   ws.onerror  = e =>console.error('socket error',e);
+   ws.onmessage= e =>{
+    const msg = JSON.parse(e.data); 
+    if (msg.conversationId) conversationId = msg.conversationId;
+    appendChat(msg.role || 'bot', msg.message);
+   };
+}
+function appendChat(sender,text){
+   const box=document.getElementById('chatBox');
+   const div=document.createElement('div');
+   div.style.margin='4px 0';
+   div.innerHTML=`<b>${sender}:</b> ${text}`;
+   box.appendChild(div);
+   box.scrollTop=box.scrollHeight;
+}
+function sendMsg(){
+   const botId=document.getElementById('chatBotSelect').value;
+   const val = document.getElementById('chatInput').value.trim();
+   if(!botId){alert('pick a bot first');return;}
+   if(!val) return;
+   const payload={botId,conversationId:conversationId,message:val}; // client sets convId if you store it
+   ws.send(JSON.stringify(payload));
+   appendChat('you',val);
+   document.getElementById('chatInput').value='';
+}
+
+let apiConversationId = null;
+
+function appendApiChat(sender, text) {
+    const box = document.getElementById('apiChatBox');
+    const div = document.createElement('div');
+    div.style.margin = '4px 0';
+    div.innerHTML = `<b>${sender}:</b> ${text}`;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+}
+
+async function sendApiMsg() {
+    const botId = document.getElementById('apiChatBotSelect').value;
+    const message = document.getElementById('apiChatInput').value.trim();
+    if (!botId) { alert('Please select a bot'); return; }
+    if (!message) return;
+
+    appendApiChat('you', message);
+    document.getElementById('apiChatInput').value = '';
+
+    const payload = {
+        botId: botId,
+        message: message,
+        conversationId: apiConversationId || "start"
+    };
+
+    const res = await fetch('/api/rag/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+    });
+
+    const json = await res.json();
+    if (json.conversationId) apiConversationId = json.conversationId;
+
+    appendApiChat('bot', json.message || '[no response]');
+}
+
+
+
+window.addEventListener('load',connectSocket);
+
+
 
 // ---------- INIT ----------
 loadBots();
