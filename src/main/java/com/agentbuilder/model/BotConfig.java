@@ -20,4 +20,10 @@ public class BotConfig {
     private String botDescription;
     private List<ToolConfig> tools;
     private KnowledgeBase knowledgeBase;
+    private String themeColor;   
+    private String textColor;     
+    private String textFont;      
+    private String avatarUrl; 
+    private String welcomeMsg;
+    
 }

@@ -50,6 +50,7 @@
     <button id="tabBtn-prompt" onclick="showTab('promptTab')">Prompt Config</button>
     <button id="tabBtn-tools"  onclick="showTab('toolsTab')" >Tools</button>
     <button id="tabBtn-kb"     onclick="showTab('kbTab')"    >Knowledge Base</button>
+	<button id="tabBtn-ui" onclick="showTab('uiTab')">UI Config</button>
     <button id="tabBtn-chat" onclick="showTab('chatTab')">Socket-Based chat</button>
 	<button id="tabBtn-apiChat" onclick="showTab('apiChatTab')">API-Based Chat</button>
 
@@ -66,6 +67,42 @@
         <tbody></tbody>
     </table>
 </section>
+
+<!-- ========= UI CONFIG TAB ========= -->
+<section id="uiTab" class="tab">
+    <h2>Bot UI Config</h2>
+
+    <!-- Pick bot -->
+    <div class="field">
+        <label>Select Bot</label>
+        <select id="uiBotSelect" onchange="loadUiCfg()"></select>
+    </div>
+
+    <!-- Form -->
+    <div id="uiFormWrap" style="display:none">
+        <div class="field"><label>Theme Colour</label>
+            <input type="color" id="uiTheme"></div>
+
+        <div class="field"><label>Text Colour</label>
+            <input type="color" id="uiText"></div>
+
+        <div class="field"><label>Font Family</label>
+            <input id="uiFont" placeholder="Inter, Roboto …"></div>
+
+        <div class="field"><label>Welcome Message</label>
+            <textarea id="uiWelcome"></textarea></div>
+
+        <div class="field"><label>Avatar Image</label>
+            <input type="file" id="uiAvatarInput" accept="image/*">
+            <button onclick="uploadAvatar()">⬆️ Upload Avatar</button>
+            <span id="uiAvatarUrl" style="font-size:.9rem;color:#555"></span>
+        </div>
+
+        <button onclick="saveUiCfg()">💾 Save</button>
+        <button class="danger" onclick="resetUiCfg()">↩️ Reset</button>
+    </div>
+</section>
+
 
 <!-- ========= LLM CONFIG TAB ========= -->
 <section id="llmTab" class="tab">
@@ -315,6 +352,7 @@ async function loadBots(){
     fillBotDropdown('kbBotSelect');
     fillBotDropdown('chatBotSelect');
 	fillBotDropdown('apiChatBotSelect');
+	fillBotDropdown('uiBotSelect');
 }
 async function saveBot(){
     const name=document.getElementById('botNameInput').value.trim();
@@ -545,6 +583,63 @@ async function sendApiMsg() {
     if (json.conversationId) apiConversationId = json.conversationId;
 
     appendApiChat('bot', json.message || '[no response]');
+}
+
+
+/* ------ UI CONFIG ------ */
+async function loadUiCfg(){
+    const bot = document.getElementById('uiBotSelect').value;
+    const wrap = document.getElementById('uiFormWrap');
+    if(!bot){wrap.style.display='none';return;}
+
+    const res = await fetch(`/api/bots/botUiConfig/${bot}`);   // GET
+    const cfg = res.ok ? await res.json() : {};
+
+    document.getElementById('uiTheme').value   = cfg.themeColor    || '#0066ff';
+    document.getElementById('uiText').value    = cfg.textColor     || '#ffffff';
+    document.getElementById('uiFont').value    = cfg.textFont      || '';
+    document.getElementById('uiWelcome').value = cfg.welcomeMessage|| '';
+    document.getElementById('uiAvatarUrl').textContent = cfg.avatarUrl || '';
+
+    wrap.style.display = 'block';
+}
+
+async function saveUiCfg(){
+    const bot = document.getElementById('uiBotSelect').value;
+    if(!bot){alert('Pick a bot');return;}
+
+    const dto = {
+        themeColor     : document.getElementById('uiTheme').value,
+        textColor      : document.getElementById('uiText').value,
+        textFont       : document.getElementById('uiFont').value.trim(),
+        welcomeMessage : document.getElementById('uiWelcome').value.trim(),
+        avatarUrl      : document.getElementById('uiAvatarUrl').textContent.trim()
+    };
+
+    await fetch(`/api/bots/updateTheme/${bot}`,{
+        method :'POST',
+        headers:{'Content-Type':'application/json'},
+        body   : JSON.stringify(dto)
+    });
+    alert('Saved');
+}
+
+function resetUiCfg(){ loadUiCfg(); }
+
+async function uploadAvatar(){
+    const bot = document.getElementById('uiBotSelect').value;
+    const inp = document.getElementById('uiAvatarInput');
+    if(!bot || !inp.files.length){alert('Pick file');return;}
+
+    const fd = new FormData();
+    fd.append('file', inp.files[0]);
+
+    const res = await fetch(`/api/bots/${bot}/avatar`,{method:'POST',body:fd});
+    const url = await res.text();
+
+    document.getElementById('uiAvatarUrl').textContent = url;
+    inp.value = '';
+    alert('Uploaded');
 }
 
 
