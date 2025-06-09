@@ -49,7 +49,8 @@ public class WidgetController {
 	            textColor: "%s",
 	            textFont: "%s",
 	            botAvatar: "%s",
-	            welcomeMessage: "%s"
+	            welcomeMessage: "%s",
+	            apiUrl:"%s"
 	          };
 	          var s = document.createElement('script');
 	          s.src = '%s/widget-core.js';
@@ -64,6 +65,7 @@ public class WidgetController {
 	           cfg.getTextFont(),
 	           cfg.getAvatarUrl(),
 	           cfg.getWelcomeMsg(),
+	           baseUrl+"/api/rag/chat",
 	           baseUrl
 	        );
 
