@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent-Builder · Login</title>
+<style>
+    :root{--accent:#0066ff;--radius:10px}
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,Arial,sans-serif}
+    body{display:flex;align-items:center;justify-content:center;height:100vh;background:#f0f4fa}
+    .card{background:#fff;padding:32px 28px;width:95%;max-width:380px;border-radius:var(--radius);
+          box-shadow:0 8px 20px rgba(0,0,0,.08)}
+    h1{margin-bottom:20px;font-size:1.6rem;color:var(--accent);text-align:center}
+    .field{margin-bottom:14px;display:flex;flex-direction:column}
+    label{margin-bottom:4px;font-weight:500}
+    input{padding:8px;border:1px solid #ccc;border-radius:var(--radius);font:inherit}
+    button{width:100%;padding:10px;border:none;border-radius:var(--radius);
+           background:var(--accent);color:#fff;font-size:1rem;cursor:pointer}
+    button:hover{background:#004ec4}
+    .error{color:#c62828;font-size:.9rem;margin-top:6px;text-align:center;display:none}
+</style>
+</head>
+<body>
+<div class="card">
+    <h1>Agent-Builder Admin</h1>
+    <div class="field">
+        <label>Username</label>
+        <input id="userInput" autocomplete="username">
+    </div>
+    <div class="field">
+        <label>Password</label>
+        <input id="passInput" type="password" autocomplete="current-password">
+    </div>
+    <button onclick="login()">Log in</button>
+    <div id="err" class="error">Invalid credentials</div>
+</div>
+
+<script>
+async function login(){
+    const username = document.getElementById('userInput').value.trim();
+    const password = document.getElementById('passInput').value.trim();
+    if(!username||!password) return;
+
+    const res = await fetch('/api/auth/login',{
+        method :'POST',
+        headers:{'Content-Type':'application/json'},
+        body   : JSON.stringify({username,password})
+    });
+
+    if(res.ok){
+        const {token} = await res.json();
+        localStorage.setItem('jwt', token);
+        location.href = 'index.html';          // <-- name of your admin page file
+    }else{
+        document.getElementById('err').style.display='block';
+    }
+}
+</script>
+</body>
+</html>

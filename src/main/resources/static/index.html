@@ -44,6 +44,7 @@
 <h1>Agent‑Builder Admin</h1>
 
 <!-- ========= NAV ========= -->
+<button style="margin-left:auto" onclick="logout()">Logout</button>
 <nav>
     <button id="tabBtn-bots"   onclick="showTab('botsTab')"   class="active">Bots</button>
     <button id="tabBtn-llm"    onclick="showTab('llmTab')"   >LLM Config</button>
@@ -253,6 +254,31 @@
 
 <!-- ========= MAIN JS ========= -->
 <script>
+	
+	(async function authGuard(){
+	    const token = localStorage.getItem('jwt');
+	    if(!token){ redirectToLogin(); return; }
+
+	    // ping backend to ensure token still valid
+	    const res = await fetch('/api/auth/me', {
+	        headers:{'Authorization':'Bearer '+token}
+	    });
+	    if(!res.ok) { localStorage.removeItem('jwt'); redirectToLogin(); }
+	})();
+
+	function redirectToLogin(){ window.location.href='login.html'; }
+	
+	function authFetch(url, opts={}) {
+	    const token = localStorage.getItem('jwt');
+	    const hdrs  = opts.headers || {};
+	    if(token) hdrs['Authorization'] = 'Bearer '+token;
+	    return fetch(url, {...opts, headers:hdrs});
+	}
+	
+	function logout(){
+	    localStorage.removeItem('jwt');
+	    redirectToLogin();
+	}
 // const baseUrl = "http://localhost:8081"; // TODO: change if backend runs elsewhere
 let bots = [];
 let currentBot = null;              // for editing bot
@@ -332,7 +358,7 @@ function closeToolModal(){document.getElementById('toolModal').style.display='no
 
 /* ------ BOTS ------ */
 async function loadBots(){
-    const res = await fetch('/api/bots');
+    const res = await authFetch('/api/bots');
     bots = await res.json();
     const tbody = document.querySelector('#botsTable tbody');
     tbody.innerHTML='';
@@ -361,16 +387,16 @@ async function saveBot(){
     const dto={botName:name,botDescription:desc};
     const opts={headers:{'Content-Type':'application/json'},body:JSON.stringify(dto)};
     if(editMode){
-        await fetch(`/api/bots/${name}`,{method:'PUT',...opts});
+        await authFetch(`/api/bots/${name}`,{method:'PUT',...opts});
     }else{
-        await fetch(`/api/bots`,{method:'POST',...opts});
+        await authFetch(`/api/bots`,{method:'POST',...opts});
     }
     closeBotModal();
     loadBots();
 }
 async function deleteBot(name){
     if(!confirm(`Delete bot "${name}"?`))return;
-    await fetch(`/api/bots/${name}`,{method:'DELETE'});
+    await authFetch(`/api/bots/${name}`,{method:'DELETE'});
     loadBots();
 }
 
@@ -388,7 +414,7 @@ async function loadLlmConfig(){
     const botId=document.getElementById('llmBotSelect').value;
     const formWrap=document.getElementById('llmFormWrapper');
     if(!botId){formWrap.style.display='none';return;}
-    const res=await fetch(`/api/llm-configs/${botId}`);
+    const res=await authFetch(`/api/llm-configs/${botId}`);
     if(res.ok){
         const cfg=await res.json();
         document.getElementById('llmModel').value=cfg.model||'';
@@ -404,15 +430,15 @@ async function loadLlmConfig(){
 async function saveLlm(){
     const botId=document.getElementById('llmBotSelect').value;
     const dto={botId:botId,model:document.getElementById('llmModel').value.trim(),temperature:parseFloat(document.getElementById('llmTemp').value),maxTokens:parseInt(document.getElementById('llmMax').value)};
-    const res=await fetch(`/api/llm-configs/${botId}`);
+    const res=await authFetch(`/api/llm-configs/${botId}`);
     const method=res.ok?'PUT':'POST';
-    await fetch(`/api/llm-configs`+(method==='PUT'?`/${botId}`:''),{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(dto)});
+    await authFetch(`/api/llm-configs`+(method==='PUT'?`/${botId}`:''),{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(dto)});
     alert('Saved');
 }
 async function deleteLlm(){
     const botId=document.getElementById('llmBotSelect').value;
     if(!confirm('Delete LLM config?'))return;
-    await fetch(`/api/llm-configs/${botId}`,{method:'DELETE'});
+    await authFetch(`/api/llm-configs/${botId}`,{method:'DELETE'});
     loadLlmConfig();
 }
 
@@ -421,7 +447,7 @@ async function loadPromptConfig(){
     const botId=document.getElementById('promptBotSelect').value;
     const wrap=document.getElementById('promptFormWrapper');
     if(!botId){wrap.style.display='none';return;}
-    const res=await fetch(`/api/prompt-configs/${botId}`);
+    const res=await authFetch(`/api/prompt-configs/${botId}`);
     if(res.ok){
         const cfg=await res.json();
         document.getElementById('promptRole').value=cfg.role||'';
@@ -437,15 +463,15 @@ async function loadPromptConfig(){
 async function savePrompt(){
     const botId=document.getElementById('promptBotSelect').value;
     const dto={botId,role:document.getElementById('promptRole').value.trim(),systemPrompt:document.getElementById('promptSys').value.trim(),firstMessage:document.getElementById('promptFirst').value.trim()};
-    const res=await fetch(`/api/prompt-configs/${botId}`);
+    const res=await authFetch(`/api/prompt-configs/${botId}`);
     const method=res.ok?'PUT':'POST';
-    await fetch(`/api/prompt-configs`+(method==='PUT'?`/${botId}`:''),{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(dto)});
+    await authFetch(`/api/prompt-configs`+(method==='PUT'?`/${botId}`:''),{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(dto)});
     alert('Saved');
 }
 async function deletePrompt(){
     const botId=document.getElementById('promptBotSelect').value;
     if(!confirm('Delete prompt config?'))return;
-    await fetch(`/api/prompt-configs/${botId}`,{method:'DELETE'});
+    await authFetch(`/api/prompt-configs/${botId}`,{method:'DELETE'});
     loadPromptConfig();
 }
 
@@ -456,7 +482,7 @@ async function loadToolsTable(){
     const tbody=document.querySelector('#toolsTable tbody');
     tbody.innerHTML='';
     if(!botName)return;
-    const res=await fetch(`/api/bots/${botName}/tools`);
+    const res=await authFetch(`/api/bots/${botName}/tools`);
     if(!res.ok)return;
     const tools=await res.json();
     tools.forEach(t=>{
@@ -483,17 +509,17 @@ async function saveTool(){
         beforeTool:document.getElementById('toolBeforeInput').value.trim(),
         afterTool:document.getElementById('toolAfterInput').value.trim()
     };
-    const res=await fetch(`/api/bots/${botName}/tools/${name}`);
+    const res=await authFetch(`/api/bots/${botName}/tools/${name}`);
     const method=res.ok?'PUT':'POST';
     const endpoint=method==='POST'?`/api/bots/${botName}/tools`:`/api/bots/${botName}/tools/${name}`;
-    await fetch(endpoint,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(dto)});
+    await authFetch(endpoint,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(dto)});
     closeToolModal();
     loadToolsTable();
 }
 async function deleteTool(name){
     const botName=document.getElementById('toolsBotSelect').value;
     if(!confirm('Delete tool?'))return;
-    await fetch(`/api/bots/${botName}/tools/${name}`,{method:'DELETE'});
+    await authFetch(`/api/bots/${botName}/tools/${name}`,{method:'DELETE'});
     loadToolsTable();
 }
 function jsonField(id){
@@ -502,7 +528,7 @@ function jsonField(id){
 }
 
 /* ---------- KNOWLEDGE BASE ---------- */
-async function loadKbData(){const bot=document.getElementById('kbBotSelect').value;document.getElementById('kbBotTitle').textContent=bot?`Bot: ${bot}`:'';const qtbody=document.querySelector('#qnaTable tbody');const ftbody=document.querySelector('#fileTable tbody');qtbody.innerHTML='';ftbody.innerHTML='';if(!bot)return;const res=await fetch(`/api/bots/${bot}/kb`);if(!res.ok)return;const kb=await res.json(); // {qnas:[],fileDetails:[]}
+async function loadKbData(){const bot=document.getElementById('kbBotSelect').value;document.getElementById('kbBotTitle').textContent=bot?`Bot: ${bot}`:'';const qtbody=document.querySelector('#qnaTable tbody');const ftbody=document.querySelector('#fileTable tbody');qtbody.innerHTML='';ftbody.innerHTML='';if(!bot)return;const res=await authFetch(`/api/bots/${bot}/kb`);if(!res.ok)return;const kb=await res.json(); // {qnas:[],fileDetails:[]}
     // QnAs
     kb.qnas.forEach((qna,idx)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${idx}</td><td>${qna.question}</td><td>${qna.answer}</td><td class='actions'></td>`;const actions=tr.querySelector('.actions');const e=document.createElement('button');e.textContent='✏️';e.onclick=()=>openQnaModal(qna,idx);const d=document.createElement('button');d.textContent='🗑️';d.className='danger';d.onclick=()=>deleteQna(idx);actions.append(e,d);qtbody.appendChild(tr);});
     // Files
@@ -510,10 +536,10 @@ async function loadKbData(){const bot=document.getElementById('kbBotSelect').val
 }
 function openQnaModal(qna,index){document.getElementById('qnaModal').style.display='flex';if(qna){editMode=true;currentQnaIndex=index;document.getElementById('qnaModalTitle').textContent='Edit QnA';document.getElementById('qnaQuestion').value=qna.question;document.getElementById('qnaAnswer').value=qna.answer;}else{editMode=false;currentQnaIndex=null;document.getElementById('qnaModalTitle').textContent='New QnA';document.getElementById('qnaQuestion').value='';document.getElementById('qnaAnswer').value='';}}
 function closeQnaModal(){document.getElementById('qnaModal').style.display='none'}
-async function saveQna(){const bot=document.getElementById('kbBotSelect').value;if(!bot){alert('Select bot');return;}const q=document.getElementById('qnaQuestion').value.trim();const a=document.getElementById('qnaAnswer').value.trim();if(!q||!a){alert('Both question and answer required');return;}const dto={question:q,answer:a};const headers={'Content-Type':'application/json'};if(editMode){await fetch(`/api/bots/${bot}/kb/qnas/${currentQnaIndex}`,{method:'PUT',headers,body:JSON.stringify(dto)});}else{await fetch(`/api/bots/${bot}/kb/qnas`,{method:'POST',headers,body:JSON.stringify(dto)});}closeQnaModal();loadKbData();}
-async function deleteQna(idx){const bot=document.getElementById('kbBotSelect').value;if(!confirm('Delete QnA?'))return;await fetch(`/api/bots/${bot}/kb/qnas/${idx}`,{method:'DELETE'});loadKbData();}
-async function uploadKbFile(){const bot=document.getElementById('kbBotSelect').value;const fileInput=document.getElementById('kbFileInput');if(!bot||!fileInput.files.length){alert('Select bot and choose file');return;}const fd=new FormData();fd.append('file',fileInput.files[0]);await fetch(`/api/bots/${bot}/kb/files`,{method:'POST',body:fd});fileInput.value='';loadKbData();}
-async function deleteKbFile(fileId){const bot=document.getElementById('kbBotSelect').value;if(!confirm('Delete file?'))return;await fetch(`/api/bots/${bot}/kb/files/${fileId}`,{method:'DELETE'});loadKbData();}
+async function saveQna(){const bot=document.getElementById('kbBotSelect').value;if(!bot){alert('Select bot');return;}const q=document.getElementById('qnaQuestion').value.trim();const a=document.getElementById('qnaAnswer').value.trim();if(!q||!a){alert('Both question and answer required');return;}const dto={question:q,answer:a};const headers={'Content-Type':'application/json'};if(editMode){await authFetch(`/api/bots/${bot}/kb/qnas/${currentQnaIndex}`,{method:'PUT',headers,body:JSON.stringify(dto)});}else{await authFetch(`/api/bots/${bot}/kb/qnas`,{method:'POST',headers,body:JSON.stringify(dto)});}closeQnaModal();loadKbData();}
+async function deleteQna(idx){const bot=document.getElementById('kbBotSelect').value;if(!confirm('Delete QnA?'))return;await authFetch(`/api/bots/${bot}/kb/qnas/${idx}`,{method:'DELETE'});loadKbData();}
+async function uploadKbFile(){const bot=document.getElementById('kbBotSelect').value;const fileInput=document.getElementById('kbFileInput');if(!bot||!fileInput.files.length){alert('Select bot and choose file');return;}const fd=new FormData();fd.append('file',fileInput.files[0]);await authFetch(`/api/bots/${bot}/kb/files`,{method:'POST',body:fd});fileInput.value='';loadKbData();}
+async function deleteKbFile(fileId){const bot=document.getElementById('kbBotSelect').value;if(!confirm('Delete file?'))return;await authFetch(`/api/bots/${bot}/kb/files/${fileId}`,{method:'DELETE'});loadKbData();}
 
 let ws=null;
 function connectSocket(){
@@ -573,7 +599,7 @@ async function sendApiMsg() {
         conversationId: apiConversationId || "start"
     };
 
-    const res = await fetch('/api/rag/chat', {
+    const res = await authFetch('/api/rag/chat', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(payload)
@@ -592,7 +618,7 @@ async function loadUiCfg(){
     const wrap = document.getElementById('uiFormWrap');
     if(!bot){wrap.style.display='none';return;}
 
-    const res = await fetch(`/api/bots/botUiConfig/${bot}`);   // GET
+    const res = await authFetch(`/api/bots/botUiConfig/${bot}`);   // GET
     const cfg = res.ok ? await res.json() : {};
 
     document.getElementById('uiTheme').value   = cfg.themeColor    || '#0066ff';
@@ -616,7 +642,7 @@ async function saveUiCfg(){
         avatarUrl      : document.getElementById('uiAvatarUrl').textContent.trim()
     };
 
-    await fetch(`/api/bots/updateTheme/${bot}`,{
+    await authFetch(`/api/bots/updateTheme/${bot}`,{
         method :'POST',
         headers:{'Content-Type':'application/json'},
         body   : JSON.stringify(dto)
@@ -634,7 +660,7 @@ async function uploadAvatar(){
     const fd = new FormData();
     fd.append('file', inp.files[0]);
 
-    const res = await fetch(`/api/bots/${bot}/avatar`,{method:'POST',body:fd});
+    const res = await authFetch(`/api/bots/${bot}/avatar`,{method:'POST',body:fd});
     const url = await res.text();
 
     document.getElementById('uiAvatarUrl').textContent = url;
