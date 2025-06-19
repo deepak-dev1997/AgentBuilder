@@ -50,7 +50,9 @@ public class WidgetController {
 	            textFont: "%s",
 	            botAvatar: "%s",
 	            welcomeMessage: "%s",
-	            apiUrl:"%s"
+	            apiUrl:"%s",
+	            ttsUrl: "%s",
+	            sttUrl: "%s"
 	          };
 	          var s = document.createElement('script');
 	          s.src = '%s/widget-core.js';
@@ -66,6 +68,8 @@ public class WidgetController {
 	           cfg.getAvatarUrl(),
 	           cfg.getWelcomeMsg(),
 	           baseUrl+"/api/rag/chat",
+	           baseUrl+"/api/audio/tts",
+	           baseUrl+"/api/audio/stt",
 	           baseUrl
 	        );
 

@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .requestMatchers("/widget/**").permitAll()
                 .requestMatchers("/api/rag/chat").permitAll()
                 .requestMatchers("/widget-core.js").permitAll()
+                .requestMatchers("api/audio/**").permitAll()
                 .anyRequest().authenticated()                    // everything else secured
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
