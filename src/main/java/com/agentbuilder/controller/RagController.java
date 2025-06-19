@@ -34,7 +34,7 @@ public class RagController {
         ChatResponse res = ragService.chat(chatRequest);
 
         if (voice && res.getMessage() != null && !res.getMessage().isBlank()) {
-            byte[] mp3 = elevenLabsService.tts(res.getMessage());
+            byte[] mp3 = elevenLabsService.tts(res.getMessage(),res.getVoiceId());
             // simplest: Base-64 inline
             res.setAudio(Base64.getEncoder().encodeToString(mp3));
             // or store the mp3 temporarily and return a URL instead

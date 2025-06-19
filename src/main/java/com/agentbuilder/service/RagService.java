@@ -148,6 +148,7 @@ public class RagService {
                 reply = toUse.getAfterTool();
                 ChatResponse chatResponse = new ChatResponse();
                 chatResponse.setMessage(reply);
+                chatResponse.setVoiceId(botConfig.getVoiceId());
                 reply+= "here is api call response - "+apiCallResponse;
                 conversation.getMessages().add(new Message("assistant",reply));
                 chatResponse.setConversationId(conversation.getId());

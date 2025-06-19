@@ -25,5 +25,7 @@ public class BotConfig {
     private String textFont;      
     private String avatarUrl; 
     private String welcomeMsg;
+    private String voiceId;
+    
     
 }

@@ -5,6 +5,7 @@ import com.agentbuilder.dtos.BotUiConfig;
 import com.agentbuilder.exception.ResourceNotFoundException;
 import com.agentbuilder.model.BotConfig;
 import com.agentbuilder.model.KnowledgeBase;
+import com.agentbuilder.model.LLMConfig;
 import com.agentbuilder.model.ToolConfig;
 import com.agentbuilder.repository.BotRepository;
 
@@ -21,6 +22,9 @@ public class BotService {
 
     @Autowired
     private BotRepository repository;
+    
+    @Autowired
+    private LLMConfigService llmConfigService;
 
 
     public List<BotConfig> findAll() {
@@ -42,7 +46,13 @@ public class BotService {
         botConfig.setTextFont("");
         botConfig.setThemeColor("#7866ff");
         botConfig.setWelcomeMsg("Hello! I'm your assistant. How can I help you today?");
-        
+        botConfig.setVoiceId(config.getVoiceId());
+        LLMConfig llmConfig = new LLMConfig();
+        llmConfig.setBotId(config.getBotName());
+        llmConfig.setModel("gpt-4o-mini");
+        llmConfig.setMaxTokens(16000);
+        llmConfig.setTemperature(0.5);
+        llmConfigService.create(llmConfig);
         return repository.save(botConfig);
     }
 
@@ -50,7 +60,7 @@ public class BotService {
         BotConfig existing = findById(id);
         existing.setBotName(config.getBotName());
         existing.setBotDescription(config.getBotDescription());
-  
+        existing.setVoiceId(config.getVoiceId());
         return repository.save(existing);
     }
 

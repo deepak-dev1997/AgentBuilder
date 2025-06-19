@@ -20,8 +20,8 @@ public class ElevenLabsService {
 
     @Value("${eleven.api.key}")
     private String apiKey;
-    @Value("${eleven.voice}")
-    private String voiceId;
+//    @Value("${eleven.voice}")
+//    private String voiceId;
     @Value("${eleven.ttsModel}")
     private String ttsModelId;
     @Value("${eleven.sttModel}")
@@ -36,7 +36,7 @@ public class ElevenLabsService {
     }
 
     /* ---------- T T S ---------- */
-    public byte[] tts(String text) {
+    public byte[] tts(String text,String voiceId) {
         // headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

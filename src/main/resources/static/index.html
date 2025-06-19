@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,674 +9,998 @@
     <!-- ===== BASIC RESET & THEME ===== -->
     <style>
         :root {
-            --accent:#0066ff;
-            --accent-light:#eaf1ff;
-            --danger:#d90429;
-            --radius:10px;
+            --accent: #0066ff;
+            --accent-light: #eaf1ff;
+            --danger: #d90429;
+            --radius: 10px;
         }
-        *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,Arial,sans-serif}
-        body{padding:24px;background:#f7f9fc;color:#222}
-        h1{margin-bottom:16px;font-size:1.8rem;color:var(--accent)}
-        button,select,input,textarea{padding:6px 10px;border:1px solid #ccc;border-radius:var(--radius);font:inherit}
-        button{cursor:pointer;background:var(--accent);color:#fff;border:none;transition:background .2s}
-        button:hover{background:#004ec4}
-        nav{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
-        nav button{background:var(--accent-light);color:var(--accent);font-weight:500}
-        nav button.active{background:var(--accent);color:#fff}
-        .tab{display:none}
-        table{width:100%;border-collapse:collapse;margin-top:12px}
-        th,td{border:1px solid #ddd;padding:8px;text-align:left}
-        th{background:#eef2f7}
-        .actions button{margin-right:6px}
-        .danger{background:var(--danger)!important}
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, Arial, sans-serif
+        }
+
+        body {
+            padding: 24px;
+            background: #f7f9fc;
+            color: #222
+        }
+
+        h1 {
+            margin-bottom: 16px;
+            font-size: 1.8rem;
+            color: var(--accent)
+        }
+
+        button,
+        select,
+        input,
+        textarea {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: var(--radius);
+            font: inherit
+        }
+
+        button {
+            cursor: pointer;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            transition: background .2s
+        }
+
+        button:hover {
+            background: #004ec4
+        }
+
+        nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap
+        }
+
+        nav button {
+            background: var(--accent-light);
+            color: var(--accent);
+            font-weight: 500
+        }
+
+        nav button.active {
+            background: var(--accent);
+            color: #fff
+        }
+
+        .tab {
+            display: none
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left
+        }
+
+        th {
+            background: #eef2f7
+        }
+
+        .actions button {
+            margin-right: 6px
+        }
+
+        .danger {
+            background: var(--danger) !important
+        }
+
         /* === Modal === */
-        .modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:999}
-        .modal .card{background:#fff;width:96%;max-width:500px;padding:20px;border-radius:var(--radius);box-shadow:0 6px 16px rgba(0,0,0,.15)}
-        .modal header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-        .modal header h2{font-size:1.25rem}
-        .close{background:none;color:#666;font-size:1.2rem;border:none}
-        .field{margin-bottom:10px;display:flex;flex-direction:column}
-        .field label{margin-bottom:4px;font-weight:500}
-        .field textarea{min-height:70px;resize:vertical;font:inherit}
-        @media(max-width:500px){body{padding:12px}nav button{flex:1}}
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999
+        }
+
+        .modal .card {
+            background: #fff;
+            width: 96%;
+            max-width: 500px;
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, .15)
+        }
+
+        .modal header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px
+        }
+
+        .modal header h2 {
+            font-size: 1.25rem
+        }
+
+        .close {
+            background: none;
+            color: #666;
+            font-size: 1.2rem;
+            border: none
+        }
+
+        .field {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column
+        }
+
+        .field label {
+            margin-bottom: 4px;
+            font-weight: 500
+        }
+
+        .field textarea {
+            min-height: 70px;
+            resize: vertical;
+            font: inherit
+        }
+
+        @media(max-width:500px) {
+            body {
+                padding: 12px
+            }
+
+            nav button {
+                flex: 1
+            }
+        }
     </style>
 </head>
+
 <body>
-<h1>Agent‑Builder Admin</h1>
+    <h1>Agent‑Builder Admin</h1>
 
-<!-- ========= NAV ========= -->
-<button style="margin-left:auto" onclick="logout()">Logout</button>
-<nav>
-    <button id="tabBtn-bots"   onclick="showTab('botsTab')"   class="active">Bots</button>
-    <button id="tabBtn-llm"    onclick="showTab('llmTab')"   >LLM Config</button>
-    <button id="tabBtn-prompt" onclick="showTab('promptTab')">Prompt Config</button>
-    <button id="tabBtn-tools"  onclick="showTab('toolsTab')" >Tools</button>
-    <button id="tabBtn-kb"     onclick="showTab('kbTab')"    >Knowledge Base</button>
-	<button id="tabBtn-ui" onclick="showTab('uiTab')">UI Config</button>
-    <button id="tabBtn-chat" onclick="showTab('chatTab')">Socket-Based chat</button>
-	<button id="tabBtn-apiChat" onclick="showTab('apiChatTab')">API-Based Chat</button>
+    <!-- ========= NAV ========= -->
+    <button style="margin-left:auto" onclick="logout()">Logout</button>
+    <nav>
+        <button id="tabBtn-bots" onclick="showTab('botsTab')" class="active">Bots</button>
+        <button id="tabBtn-llm" onclick="showTab('llmTab')">LLM Config</button>
+        <button id="tabBtn-prompt" onclick="showTab('promptTab')">Prompt Config</button>
+        <button id="tabBtn-tools" onclick="showTab('toolsTab')">Tools</button>
+        <button id="tabBtn-kb" onclick="showTab('kbTab')">Knowledge Base</button>
+        <button id="tabBtn-ui" onclick="showTab('uiTab')">UI Config</button>
+        <!-- <button id="tabBtn-chat" onclick="showTab('chatTab')">Socket-Based chat</button> -->
+        <button id="tabBtn-apiChat" onclick="showTab('apiChatTab')">API-Based Chat</button>
 
-</nav>
+    </nav>
 
-<!-- ========= BOTS TAB ========= -->
-<section id="botsTab" class="tab" style="display:block">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-        <h2>Bots</h2>
-        <button onclick="openBotModal()">➕  New Bot</button>
-    </div>
-    <table id="botsTable">
-        <thead><tr><th>Name</th><th>Description</th><th>Actions</th></tr></thead>
-        <tbody></tbody>
-    </table>
-</section>
+    <!-- ========= BOTS TAB ========= -->
+    <section id="botsTab" class="tab" style="display:block">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+            <h2>Bots</h2>
+            <button onclick="openBotModal()">➕ New Bot</button>
+        </div>
+        <table id="botsTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
 
-<!-- ========= UI CONFIG TAB ========= -->
-<section id="uiTab" class="tab">
-    <h2>Bot UI Config</h2>
+    <!-- ========= UI CONFIG TAB ========= -->
+    <section id="uiTab" class="tab">
+        <h2>Bot UI Config</h2>
 
-    <!-- Pick bot -->
-    <div class="field">
-        <label>Select Bot</label>
-        <select id="uiBotSelect" onchange="loadUiCfg()"></select>
-    </div>
-
-    <!-- Form -->
-    <div id="uiFormWrap" style="display:none">
-        <div class="field"><label>Theme Colour</label>
-            <input type="color" id="uiTheme"></div>
-
-        <div class="field"><label>Text Colour</label>
-            <input type="color" id="uiText"></div>
-
-        <div class="field"><label>Font Family</label>
-            <input id="uiFont" placeholder="Inter, Roboto …"></div>
-
-        <div class="field"><label>Welcome Message</label>
-            <textarea id="uiWelcome"></textarea></div>
-
-        <div class="field"><label>Avatar Image</label>
-            <input type="file" id="uiAvatarInput" accept="image/*">
-            <button onclick="uploadAvatar()">⬆️ Upload Avatar</button>
-            <span id="uiAvatarUrl" style="font-size:.9rem;color:#555"></span>
+        <!-- Pick bot -->
+        <div class="field">
+            <label>Select Bot</label>
+            <select id="uiBotSelect" onchange="loadUiCfg()"></select>
         </div>
 
-        <button onclick="saveUiCfg()">💾 Save</button>
-        <button class="danger" onclick="resetUiCfg()">↩️ Reset</button>
-    </div>
-</section>
+        <!-- Form -->
+        <div id="uiFormWrap" style="display:none">
+            <div class="field"><label>Theme Colour</label>
+                <input type="color" id="uiTheme">
+            </div>
+
+            <div class="field"><label>Text Colour</label>
+                <input type="color" id="uiText">
+            </div>
+
+            <div class="field"><label>Font Family</label>
+                <input id="uiFont" placeholder="Inter, Roboto …">
+            </div>
+
+            <div class="field"><label>Welcome Message</label>
+                <textarea id="uiWelcome"></textarea>
+            </div>
+
+            <div class="field"><label>Avatar Image</label>
+                <input type="file" id="uiAvatarInput" accept="image/*">
+                <button onclick="uploadAvatar()">⬆️ Upload Avatar</button>
+                <span id="uiAvatarUrl" style="font-size:.9rem;color:#555"></span>
+            </div>
+
+            <button onclick="saveUiCfg()">💾 Save</button>
+            <button class="danger" onclick="resetUiCfg()">↩️ Reset</button>
+        </div>
+    </section>
 
 
-<!-- ========= LLM CONFIG TAB ========= -->
-<section id="llmTab" class="tab">
-    <h2>LLM Configuration</h2>
-    <div class="field">
-        <label for="llmBotSelect">Select Bot</label>
-        <select id="llmBotSelect" onchange="loadLlmConfig()"></select>
-    </div>
+    <!-- ========= LLM CONFIG TAB ========= -->
+    <section id="llmTab" class="tab">
+        <h2>LLM Configuration</h2>
+        <div class="field">
+            <label for="llmBotSelect">Select Bot</label>
+            <select id="llmBotSelect" onchange="loadLlmConfig()"></select>
+        </div>
 
-    <div id="llmFormWrapper" style="display:none">
-        <div class="field"><label>Model</label><input id="llmModel"></div>
-        <div class="field"><label>Temperature</label><input type="number" step="0.01" id="llmTemp"></div>
-        <div class="field"><label>Max Tokens</label><input type="number" id="llmMax"></div>
-        <button onclick="saveLlm()">💾 Save</button>
-        <button class="danger" onclick="deleteLlm()">🗑️ Delete</button>
-    </div>
-</section>
+        <div id="llmFormWrapper" style="display:none">
+            <div class="field"><label>Model</label><input id="llmModel"></div>
+            <div class="field"><label>Temperature</label><input type="number" step="0.01" id="llmTemp"></div>
+            <div class="field"><label>Max Tokens</label><input type="number" id="llmMax"></div>
+            <button onclick="saveLlm()">💾 Save</button>
+            <button class="danger" onclick="deleteLlm()">🗑️ Delete</button>
+        </div>
+    </section>
 
-<!-- ========= PROMPT CONFIG TAB ========= -->
-<section id="promptTab" class="tab">
-    <h2>Prompt Configuration</h2>
-    <div class="field">
-        <label for="promptBotSelect">Select Bot</label>
-        <select id="promptBotSelect" onchange="loadPromptConfig()"></select>
-    </div>
+    <!-- ========= PROMPT CONFIG TAB ========= -->
+    <section id="promptTab" class="tab">
+        <h2>Prompt Configuration</h2>
+        <div class="field">
+            <label for="promptBotSelect">Select Bot</label>
+            <select id="promptBotSelect" onchange="loadPromptConfig()"></select>
+        </div>
 
-    <div id="promptFormWrapper" style="display:none">
-        <div class="field"><label>Role</label><input id="promptRole"></div>
-        <div class="field"><label>System Prompt</label><textarea id="promptSys"></textarea></div>
-        <div class="field"><label>First Message</label><textarea id="promptFirst"></textarea></div>
-        <button onclick="savePrompt()">💾 Save</button>
-        <button class="danger" onclick="deletePrompt()">🗑️ Delete</button>
-    </div>
-</section>
+        <div id="promptFormWrapper" style="display:none">
+            <div class="field"><label>Role</label><input id="promptRole"></div>
+            <div class="field"><label>System Prompt</label><textarea id="promptSys"></textarea></div>
+            <div style="display: none;" class="field"><label>First Message</label><textarea id="promptFirst"></textarea>
+            </div>
+            <button onclick="savePrompt()">💾 Save</button>
+            <button class="danger" onclick="deletePrompt()">🗑️ Delete</button>
+        </div>
+    </section>
 
-<!-- ========= TOOLS TAB ========= -->
-<section id="toolsTab" class="tab">
-    <h2>Tools</h2>
-    <div class="field">
-        <label for="toolsBotSelect">Select Bot</label>
-        <select id="toolsBotSelect" onchange="loadToolsTable()"></select>
-    </div>
+    <!-- ========= TOOLS TAB ========= -->
+    <section id="toolsTab" class="tab">
+        <h2>Tools</h2>
+        <div class="field">
+            <label for="toolsBotSelect">Select Bot</label>
+            <select id="toolsBotSelect" onchange="loadToolsTable()"></select>
+        </div>
 
-    <div style="display:flex;justify-content:space-between;align-items:center">
-        <h3 id="selectedBotTitle"></h3>
-        <button onclick="openToolModal()">➕  New Tool</button>
-    </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+            <h3 id="selectedBotTitle"></h3>
+            <button onclick="openToolModal()">➕ New Tool</button>
+        </div>
 
-    <table id="toolsTable">
-        <thead><tr><th>Name</th><th>Description</th><th>Server URL</th><th>Actions</th></tr></thead>
-        <tbody></tbody>
-    </table>
-</section>
+        <table id="toolsTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Server URL</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
 
-<!-- ========= KNOWLEDGE BASE TAB ========= -->
-<section id="kbTab" class="tab">
-    <h2>Knowledge Base</h2>
-    <div class="field"><label>Select Bot</label><select id="kbBotSelect" onchange="loadKbData()"></select></div>
+    <!-- ========= KNOWLEDGE BASE TAB ========= -->
+    <section id="kbTab" class="tab">
+        <h2>Knowledge Base</h2>
+        <div class="field"><label>Select Bot</label><select id="kbBotSelect" onchange="loadKbData()"></select></div>
 
-    <!-- QnA section -->
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-        <h3 id="kbBotTitle"></h3>
-        <button onclick="openQnaModal()">➕ Add QnA</button>
-    </div>
-    <table id="qnaTable"><thead><tr><th>#</th><th>Question</th><th>Answer</th><th>Actions</th></tr></thead><tbody></tbody></table>
+        <!-- QnA section -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+            <h3 id="kbBotTitle"></h3>
+            <button onclick="openQnaModal()">➕ Add QnA</button>
+        </div>
+        <table id="qnaTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Question</th>
+                    <th>Answer</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
 
-    <!-- Files -->
-    <h3 style="margin-top:20px">Files</h3>
-    <div style="display:flex;gap:8px;align-items:center">
-        <input type="file" id="kbFileInput">
-        <button onclick="uploadKbFile()">⬆️ Upload</button>
-    </div>
-    <table id="fileTable" style="margin-top:12px"><thead><tr><th>Name</th><th>Actions</th></tr></thead><tbody></tbody></table>
-</section>
+        <!-- Files -->
+        <h3 style="margin-top:20px">Files</h3>
+        <div style="display:flex;gap:8px;align-items:center">
+            <input type="file" id="kbFileInput">
+            <button onclick="uploadKbFile()">⬆️ Upload</button>
+        </div>
+        <table id="fileTable" style="margin-top:12px">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
 
 
-<!-- ===== Chat TAB ===== -->
-<section id="chatTab" class="tab">
-    <h2>Chat</h2>
-  
-    <!-- pick which bot to talk to -->
-    <div class="field">
-        <label>Select Bot</label>
-        <select id="chatBotSelect"></select>
-    </div>
-  
-    <!-- chat window -->
-    <div id="chatBox" style="height:320px;overflow-y:auto;
+    <!-- ===== Chat TAB ===== -->
+    <section id="chatTab" class="tab">
+        <h2>Chat</h2>
+
+        <!-- pick which bot to talk to -->
+        <div class="field">
+            <label>Select Bot</label>
+            <select id="chatBotSelect"></select>
+        </div>
+
+        <!-- chat window -->
+        <div id="chatBox" style="height:320px;overflow-y:auto;
                              border:1px solid #ddd;padding:10px;margin:10px 0;
                              background:#fff;border-radius:var(--radius)"></div>
-  
-    <!-- composer -->
-    <div style="display:flex;gap:8px">
-        <input id="chatInput" style="flex:1" placeholder="Type a message…">
-        <button onclick="sendMsg()">➤</button>
-    </div>
-  </section>
-  
-  <!-- ========= API Chat TAB ========= -->
-  <section id="apiChatTab" class="tab">
-      <h2>API Chat</h2>
 
-      <div class="field">
-          <label>Select Bot</label>
-          <select id="apiChatBotSelect"></select>
-      </div>
+        <!-- composer -->
+        <div style="display:flex;gap:8px">
+            <input id="chatInput" style="flex:1" placeholder="Type a message…">
+            <button onclick="sendMsg()">➤</button>
+        </div>
+    </section>
 
-      <div id="apiChatBox" style="height:320px;overflow-y:auto;
+    <!-- ========= API Chat TAB ========= -->
+    <section id="apiChatTab" class="tab">
+        <h2>API Chat</h2>
+
+        <div class="field">
+            <label>Select Bot</label>
+            <select id="apiChatBotSelect"></select>
+        </div>
+
+        <div id="apiChatBox" style="height:320px;overflow-y:auto;
                                   border:1px solid #ddd;padding:10px;margin:10px 0;
                                   background:#fff;border-radius:var(--radius)">
-      </div>
+        </div>
 
-      <div style="display:flex;gap:8px">
-          <input id="apiChatInput" style="flex:1" placeholder="Type a message…">
-          <button onclick="sendApiMsg()">➤</button>
-      </div>
-  </section>
+        <div style="display:flex;gap:8px">
+            <input id="apiChatInput" style="flex:1" placeholder="Type a message…">
+            <button id="apiSendBtn">➤</button>
+            <button id="apiMicBtn">🎤</button> <!-- NEW -->
+            <audio id="apiPlayer" hidden></audio><!-- NEW -->
+        </div>
+
+    </section>
 
 
-<!-- ========= BOT MODAL ========= -->
-<div id="botModal" class="modal">
-    <div class="card">
-        <header><h2 id="botModalTitle">New Bot</h2><button class="close" onclick="closeBotModal()">✖</button></header>
-        <div class="field"><label>Name</label><input id="botNameInput"></div>
-        <div class="field"><label>Description</label><textarea id="botDescInput"></textarea></div>
-        <button onclick="saveBot()">💾 Save</button>
+    <!-- ========= BOT MODAL ========= -->
+    <div id="botModal" class="modal">
+        <div class="card">
+            <header>
+                <h2 id="botModalTitle">New Bot</h2><button class="close" onclick="closeBotModal()">✖</button>
+            </header>
+            <div class="field"><label>Name</label><input id="botNameInput"></div>
+            <div class="field"><label>Description</label><textarea id="botDescInput"></textarea></div>
+            <div class="field">
+                <label>Voice Profile</label>
+                <div style="display:flex;gap:12px;align-items:center">
+                    <label><input type="radio" name="voiceGender" value="male" checked
+                            onchange="onVoiceGenderChange(this.value)"> Male</label>
+                    <label><input type="radio" name="voiceGender" value="female"
+                            onchange="onVoiceGenderChange(this.value)"> Female</label>
+                </div>
+            </div>
+            <div class="field" id="voiceSelectField">
+                <label>Voice</label>
+                <select id="voiceSelect"></select>
+            </div>
+            <button onclick="saveBot()">💾 Save</button>
+        </div>
     </div>
-</div>
 
-<!-- ========= TOOL MODAL ========= -->
-<div id="toolModal" class="modal">
-    <div class="card" style="max-width:600px">
-        <header><h2 id="toolModalTitle">New Tool</h2><button class="close" onclick="closeToolModal()">✖</button></header>
-        <div class="field"><label>Name</label><input id="toolNameInput"></div>
-        <div class="field"><label>Description</label><textarea id="toolDescInput"></textarea></div>
-        <div class="field"><label>Server URL</label><input id="toolUrlInput"></div>
-        <div class="field"><label>Headers (JSON)</label><textarea id="toolHeadersInput"></textarea></div>
-        <div class="field"><label>Parameters (JSON)</label><textarea id="toolParamsInput"></textarea></div>
-        <div class="field"><label>Request Body (JSON)</label><textarea id="toolBodyInput"></textarea></div>
-        <div class="field"><label>Before Tool</label><input id="toolBeforeInput"></div>
-        <div class="field"><label>After Tool</label><input id="toolAfterInput"></div>
-        <button onclick="saveTool()">💾 Save</button>
+    <!-- ========= TOOL MODAL ========= -->
+    <div id="toolModal" class="modal">
+        <div class="card" style="max-width:600px">
+            <header>
+                <h2 id="toolModalTitle">New Tool</h2><button class="close" onclick="closeToolModal()">✖</button>
+            </header>
+            <div class="field"><label>Name</label><input id="toolNameInput"></div>
+            <div class="field"><label>Description</label><textarea id="toolDescInput"></textarea></div>
+            <div class="field"><label>Server URL</label><input id="toolUrlInput"></div>
+            <div class="field"><label>Headers (JSON)</label><textarea id="toolHeadersInput"></textarea></div>
+            <div class="field"><label>Parameters (JSON)</label><textarea id="toolParamsInput"></textarea></div>
+            <div class="field"><label>Request Body (JSON)</label><textarea id="toolBodyInput"></textarea></div>
+            <div class="field"><label>Before Tool</label><input id="toolBeforeInput"></div>
+            <div class="field"><label>After Tool</label><input id="toolAfterInput"></div>
+            <button onclick="saveTool()">💾 Save</button>
+        </div>
     </div>
-</div>
-<!-- ========= QNA MODAL ========= -->
-<div id="qnaModal" class="modal"><div class="card"><header><h2 id="qnaModalTitle">New QnA</h2><button class="close" onclick="closeQnaModal()">✖</button></header><div class="field"><label>Question</label><textarea id="qnaQuestion"></textarea></div><div class="field"><label>Answer</label><textarea id="qnaAnswer"></textarea></div><button onclick="saveQna()">💾 Save</button></div></div>
+    <!-- ========= QNA MODAL ========= -->
+    <div id="qnaModal" class="modal">
+        <div class="card">
+            <header>
+                <h2 id="qnaModalTitle">New QnA</h2><button class="close" onclick="closeQnaModal()">✖</button>
+            </header>
+            <div class="field"><label>Question</label><textarea id="qnaQuestion"></textarea></div>
+            <div class="field"><label>Answer</label><textarea id="qnaAnswer"></textarea></div><button
+                onclick="saveQna()">💾 Save</button>
+        </div>
+    </div>
 
 
-<!-- ========= MAIN JS ========= -->
-<script>
-	
-	(async function authGuard(){
-	    const token = localStorage.getItem('jwt');
-	    if(!token){ redirectToLogin(); return; }
+    <!-- ========= MAIN JS ========= -->
+    <script>
 
-	    // ping backend to ensure token still valid
-	    const res = await fetch('/api/auth/me', {
-	        headers:{'Authorization':'Bearer '+token}
-	    });
-	    if(!res.ok) { localStorage.removeItem('jwt'); redirectToLogin(); }
-	})();
+        (async function authGuard() {
+            const token = localStorage.getItem('jwt');
+            if (!token) { redirectToLogin(); return; }
 
-	function redirectToLogin(){ window.location.href='login.html'; }
-	
-	function authFetch(url, opts={}) {
-	    const token = localStorage.getItem('jwt');
-	    const hdrs  = opts.headers || {};
-	    if(token) hdrs['Authorization'] = 'Bearer '+token;
-	    return fetch(url, {...opts, headers:hdrs});
-	}
-	
-	function logout(){
-	    localStorage.removeItem('jwt');
-	    redirectToLogin();
-	}
-// const baseUrl = "http://localhost:8081"; // TODO: change if backend runs elsewhere
-let bots = [];
-let currentBot = null;              // for editing bot
-let editMode = false;               // bot modal state
-let currentTool = null;             // for editing tool
-let conversationId=0;
+            // ping backend to ensure token still valid
+            const res = await fetch('/api/auth/me', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (!res.ok) { localStorage.removeItem('jwt'); redirectToLogin(); }
+        })();
+
+        function redirectToLogin() { window.location.href = 'login.html'; }
+
+        function authFetch(url, opts = {}) {
+            const token = localStorage.getItem('jwt');
+            const hdrs = opts.headers || {};
+            if (token) hdrs['Authorization'] = 'Bearer ' + token;
+            return fetch(url, { ...opts, headers: hdrs });
+        }
+
+        function logout() {
+            localStorage.removeItem('jwt');
+            redirectToLogin();
+        }
+
+        const maleVoices = [
+            { id: 'T5cu6IU92Krx4mh43osx', name: 'Bill Oxley' },
+            { id: 'UgBBYS2sOqTuMpoF3BR0', name: 'Mark- Natural Conversations' }
+        ];
+        const femaleVoices = [
+            { id: 'cgSgspJ2msm6clMCkdW9', name: 'jessica' },
+            { id: 'XrExE9yKIg1WjnnlVkGX', name: 'Matilda' },
+            { id: '56AoDkrOh6qfVPDXZ7Pt', name: 'Cassidy' }
+        ];
+
+        function populateVoiceSelect(gender = 'male') {
+            const sel = document.getElementById('voiceSelect');
+            sel.innerHTML = '';
+            const arr = gender === 'male' ? maleVoices : femaleVoices;
+            arr.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.id;
+                opt.textContent = v.name;
+                sel.appendChild(opt);
+            });
+        }
+
+        function onVoiceGenderChange(gender) {
+            populateVoiceSelect(gender);
+        }
+
+        // populate default on load
+        document.addEventListener('DOMContentLoaded', () => populateVoiceSelect('male'));
+
+        // const baseUrl = "http://localhost:8081"; // TODO: change if backend runs elsewhere
+        let bots = [];
+        let currentBot = null;              // for editing bot
+        let editMode = false;               // bot modal state
+        let currentTool = null;             // for editing tool
+        let conversationId = 0;
 
 
-document.getElementById('apiChatInput').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault(); // prevent newline in input
-        sendApiMsg();
+        document.getElementById('apiChatInput').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // prevent newline in input
+                sendApiMsg();
+            }
+        });
+
+
+        document.getElementById('chatInput').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // prevent newline in input
+                sendMsg();
+            }
+        });
+
+        /* ------ BASIC HELPERS ------ */
+        function showTab(tabId) {
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tabBtn-' + tabId.replace('Tab', '')).classList.add('active');
+            document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
+            document.getElementById(tabId).style.display = 'block';
+            if (tabId === 'botsTab') loadBots();
+            if (tabId === 'kbTab') loadKbData();
+
+        }
+        function openBotModal(bot) {
+            document.getElementById('botModal').style.display = 'flex';
+            if (bot) {
+                editMode = true;
+                currentBot = bot;
+                document.getElementById('botModalTitle').textContent = 'Edit Bot';
+                document.getElementById('botNameInput').value = bot.botName;
+                document.getElementById('botNameInput').disabled = true; // id immutable
+                document.getElementById('botDescInput').value = bot.botDescription;
+            } else {
+                editMode = false;
+                currentBot = null;
+                document.getElementById('botModalTitle').textContent = 'New Bot';
+                document.getElementById('botNameInput').disabled = false;
+                document.getElementById('botNameInput').value = '';
+                document.getElementById('botDescInput').value = '';
+            }
+        }
+        function closeBotModal() { document.getElementById('botModal').style.display = 'none' }
+        function openToolModal(tool) {
+            if (!document.getElementById('toolsBotSelect').value) { alert('Select a bot first'); return; }
+            document.getElementById('toolModal').style.display = 'flex';
+            if (tool) {
+                currentTool = tool;
+                editMode = true;
+                document.getElementById('toolModalTitle').textContent = 'Edit Tool';
+                document.getElementById('toolNameInput').value = tool.toolName;
+                document.getElementById('toolNameInput').disabled = true;
+                document.getElementById('toolDescInput').value = tool.description || '';
+                document.getElementById('toolUrlInput').value = tool.serverUrl || '';
+                document.getElementById('toolHeadersInput').value = JSON.stringify(tool.headers || {}, null, 2);
+                document.getElementById('toolParamsInput').value = JSON.stringify(tool.parameters || {}, null, 2);
+                document.getElementById('toolBodyInput').value = JSON.stringify(tool.requestBody || {}, null, 2);
+                document.getElementById('toolBeforeInput').value = tool.beforeTool || '';
+                document.getElementById('toolAfterInput').value = tool.afterTool || '';
+            } else {
+                editMode = false;
+                currentTool = null;
+                document.getElementById('toolModalTitle').textContent = 'New Tool';
+                document.querySelectorAll('#toolModal input, #toolModal textarea').forEach(el => { el.disabled = false; el.value = '' });
+            }
+        }
+        function closeToolModal() { document.getElementById('toolModal').style.display = 'none' }
+
+        /* ------ BOTS ------ */
+        async function loadBots() {
+            const res = await authFetch('/api/bots');
+            bots = await res.json();
+            const tbody = document.querySelector('#botsTable tbody');
+            tbody.innerHTML = '';
+            bots.forEach(b => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${b.botName}</td><td>${b.botDescription || ''}</td><td class="actions"></td>`;
+                const actions = tr.querySelector('.actions');
+                const editBtn = document.createElement('button'); editBtn.textContent = '✏️ Edit'; editBtn.onclick = () => openBotModal(b);
+                const delBtn = document.createElement('button'); delBtn.textContent = '🗑️'; delBtn.className = 'danger'; delBtn.onclick = () => deleteBot(b.botName);
+                actions.append(editBtn, delBtn);
+                tbody.appendChild(tr);
+            });
+            // Refresh dropdowns
+            fillBotDropdown('llmBotSelect');
+            fillBotDropdown('promptBotSelect');
+            fillBotDropdown('toolsBotSelect');
+            fillBotDropdown('kbBotSelect');
+            fillBotDropdown('chatBotSelect');
+            fillBotDropdown('apiChatBotSelect');
+            fillBotDropdown('uiBotSelect');
+        }
+        async function saveBot() {
+            const name = document.getElementById('botNameInput').value.trim();
+            const desc = document.getElementById('botDescInput').value.trim();
+            const voiceId = document.getElementById('voiceSelect').value;
+            if (!name) { alert('Name required'); return; }
+            const dto = { botName: name, botDescription: desc, voiceId: voiceId };
+            const opts = { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dto) };
+            if (editMode) {
+                await authFetch(`/api/bots/${name}`, { method: 'PUT', ...opts });
+            } else {
+                await authFetch(`/api/bots`, { method: 'POST', ...opts });
+            }
+            closeBotModal();
+            loadBots();
+        }
+        async function deleteBot(name) {
+            if (!confirm(`Delete bot "${name}"?`)) return;
+            await authFetch(`/api/bots/${name}`, { method: 'DELETE' });
+            loadBots();
+        }
+
+        /* ------ LLM CONFIG ------ */
+        function fillBotDropdown(id) {
+            const sel = document.getElementById(id);
+            const current = sel.value;
+            sel.innerHTML = '<option value="">-- choose --</option>';
+            bots.forEach(b => {
+                const opt = document.createElement('option'); opt.value = b.botName; opt.textContent = b.botName; sel.appendChild(opt);
+            });
+            if (current) sel.value = current; // keep selection if possible
+        }
+        async function loadLlmConfig() {
+            const botId = document.getElementById('llmBotSelect').value;
+            const formWrap = document.getElementById('llmFormWrapper');
+            if (!botId) { formWrap.style.display = 'none'; return; }
+            const res = await authFetch(`/api/llm-configs/${botId}`);
+            if (res.ok) {
+                const cfg = await res.json();
+                document.getElementById('llmModel').value = cfg.model || '';
+                document.getElementById('llmTemp').value = cfg.temperature || 0.0;
+                document.getElementById('llmMax').value = cfg.maxTokens || 0;
+            } else {
+                document.getElementById('llmModel').value = '';
+                document.getElementById('llmTemp').value = '';
+                document.getElementById('llmMax').value = '';
+            }
+            formWrap.style.display = 'block';
+        }
+        async function saveLlm() {
+            const botId = document.getElementById('llmBotSelect').value;
+            const dto = { botId: botId, model: document.getElementById('llmModel').value.trim(), temperature: parseFloat(document.getElementById('llmTemp').value), maxTokens: parseInt(document.getElementById('llmMax').value) };
+            const res = await authFetch(`/api/llm-configs/${botId}`);
+            const method = res.ok ? 'PUT' : 'POST';
+            await authFetch(`/api/llm-configs` + (method === 'PUT' ? `/${botId}` : ''), { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dto) });
+            alert('Saved');
+        }
+        async function deleteLlm() {
+            const botId = document.getElementById('llmBotSelect').value;
+            if (!confirm('Delete LLM config?')) return;
+            await authFetch(`/api/llm-configs/${botId}`, { method: 'DELETE' });
+            loadLlmConfig();
+        }
+
+        /* ------ PROMPT CONFIG ------ */
+        async function loadPromptConfig() {
+            const botId = document.getElementById('promptBotSelect').value;
+            const wrap = document.getElementById('promptFormWrapper');
+            if (!botId) { wrap.style.display = 'none'; return; }
+            const res = await authFetch(`/api/prompt-configs/${botId}`);
+            if (res.ok) {
+                const cfg = await res.json();
+                document.getElementById('promptRole').value = cfg.role || '';
+                document.getElementById('promptSys').value = cfg.systemPrompt || '';
+                document.getElementById('promptFirst').value = cfg.firstMessage || '';
+            } else {
+                document.getElementById('promptRole').value = '';
+                document.getElementById('promptSys').value = '';
+                document.getElementById('promptFirst').value = '';
+            }
+            wrap.style.display = 'block';
+        }
+        async function savePrompt() {
+            const botId = document.getElementById('promptBotSelect').value;
+            const dto = { botId, role: document.getElementById('promptRole').value.trim(), systemPrompt: document.getElementById('promptSys').value.trim(), firstMessage: document.getElementById('promptFirst').value.trim() };
+            const res = await authFetch(`/api/prompt-configs/${botId}`);
+            const method = res.ok ? 'PUT' : 'POST';
+            await authFetch(`/api/prompt-configs` + (method === 'PUT' ? `/${botId}` : ''), { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dto) });
+            alert('Saved');
+        }
+        async function deletePrompt() {
+            const botId = document.getElementById('promptBotSelect').value;
+            if (!confirm('Delete prompt config?')) return;
+            await authFetch(`/api/prompt-configs/${botId}`, { method: 'DELETE' });
+            loadPromptConfig();
+        }
+
+        /* ------ TOOLS ------ */
+        async function loadToolsTable() {
+            const botName = document.getElementById('toolsBotSelect').value;
+            document.getElementById('selectedBotTitle').textContent = botName ? `Bot: ${botName}` : '';
+            const tbody = document.querySelector('#toolsTable tbody');
+            tbody.innerHTML = '';
+            if (!botName) return;
+            const res = await authFetch(`/api/bots/${botName}/tools`);
+            if (!res.ok) return;
+            const tools = await res.json();
+            tools.forEach(t => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${t.toolName}</td><td>${t.description || ''}</td><td>${t.serverUrl || ''}</td><td class="actions"></td>`;
+                const actions = tr.querySelector('.actions');
+                const edit = document.createElement('button'); edit.textContent = '✏️'; edit.onclick = () => openToolModal(t);
+                const del = document.createElement('button'); del.textContent = '🗑️'; del.className = 'danger'; del.onclick = () => deleteTool(t.toolName);
+                actions.append(edit, del);
+                tbody.appendChild(tr);
+            });
+        }
+        async function saveTool() {
+            const botName = document.getElementById('toolsBotSelect').value;
+            const name = document.getElementById('toolNameInput').value.trim();
+            if (!name) { alert('Tool name required'); return; }
+            const dto = {
+                toolName: name,
+                description: document.getElementById('toolDescInput').value.trim(),
+                serverUrl: document.getElementById('toolUrlInput').value.trim(),
+                headers: jsonField('toolHeadersInput'),
+                parameters: jsonField('toolParamsInput'),
+                requestBody: jsonField('toolBodyInput'),
+                beforeTool: document.getElementById('toolBeforeInput').value.trim(),
+                afterTool: document.getElementById('toolAfterInput').value.trim()
+            };
+            const res = await authFetch(`/api/bots/${botName}/tools/${name}`);
+            const method = res.ok ? 'PUT' : 'POST';
+            const endpoint = method === 'POST' ? `/api/bots/${botName}/tools` : `/api/bots/${botName}/tools/${name}`;
+            await authFetch(endpoint, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dto) });
+            closeToolModal();
+            loadToolsTable();
+        }
+        async function deleteTool(name) {
+            const botName = document.getElementById('toolsBotSelect').value;
+            if (!confirm('Delete tool?')) return;
+            await authFetch(`/api/bots/${botName}/tools/${name}`, { method: 'DELETE' });
+            loadToolsTable();
+        }
+        function jsonField(id) {
+            try { return JSON.parse(document.getElementById(id).value || '{}'); }
+            catch (e) { alert(id + ' must be valid JSON'); throw e; }
+        }
+
+        /* ---------- KNOWLEDGE BASE ---------- */
+        async function loadKbData() {
+            const bot = document.getElementById('kbBotSelect').value; document.getElementById('kbBotTitle').textContent = bot ? `Bot: ${bot}` : ''; const qtbody = document.querySelector('#qnaTable tbody'); const ftbody = document.querySelector('#fileTable tbody'); qtbody.innerHTML = ''; ftbody.innerHTML = ''; if (!bot) return; const res = await authFetch(`/api/bots/${bot}/kb`); if (!res.ok) return; const kb = await res.json(); // {qnas:[],fileDetails:[]}
+            // QnAs
+            kb.qnas.forEach((qna, idx) => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${idx}</td><td>${qna.question}</td><td>${qna.answer}</td><td class='actions'></td>`; const actions = tr.querySelector('.actions'); const e = document.createElement('button'); e.textContent = '✏️'; e.onclick = () => openQnaModal(qna, idx); const d = document.createElement('button'); d.textContent = '🗑️'; d.className = 'danger'; d.onclick = () => deleteQna(idx); actions.append(e, d); qtbody.appendChild(tr); });
+            // Files
+            kb.fileDetails.forEach(fd => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${fd.fileName}</td><td class='actions'></td>`; const del = document.createElement('button'); del.textContent = '🗑️'; del.className = 'danger'; del.onclick = () => deleteKbFile(fd.fileId); tr.querySelector('.actions').append(del); ftbody.appendChild(tr); });
+        }
+        function openQnaModal(qna, index) { document.getElementById('qnaModal').style.display = 'flex'; if (qna) { editMode = true; currentQnaIndex = index; document.getElementById('qnaModalTitle').textContent = 'Edit QnA'; document.getElementById('qnaQuestion').value = qna.question; document.getElementById('qnaAnswer').value = qna.answer; } else { editMode = false; currentQnaIndex = null; document.getElementById('qnaModalTitle').textContent = 'New QnA'; document.getElementById('qnaQuestion').value = ''; document.getElementById('qnaAnswer').value = ''; } }
+        function closeQnaModal() { document.getElementById('qnaModal').style.display = 'none' }
+        async function saveQna() { const bot = document.getElementById('kbBotSelect').value; if (!bot) { alert('Select bot'); return; } const q = document.getElementById('qnaQuestion').value.trim(); const a = document.getElementById('qnaAnswer').value.trim(); if (!q || !a) { alert('Both question and answer required'); return; } const dto = { question: q, answer: a }; const headers = { 'Content-Type': 'application/json' }; if (editMode) { await authFetch(`/api/bots/${bot}/kb/qnas/${currentQnaIndex}`, { method: 'PUT', headers, body: JSON.stringify(dto) }); } else { await authFetch(`/api/bots/${bot}/kb/qnas`, { method: 'POST', headers, body: JSON.stringify(dto) }); } closeQnaModal(); loadKbData(); }
+        async function deleteQna(idx) { const bot = document.getElementById('kbBotSelect').value; if (!confirm('Delete QnA?')) return; await authFetch(`/api/bots/${bot}/kb/qnas/${idx}`, { method: 'DELETE' }); loadKbData(); }
+        async function uploadKbFile() { const bot = document.getElementById('kbBotSelect').value; const fileInput = document.getElementById('kbFileInput'); if (!bot || !fileInput.files.length) { alert('Select bot and choose file'); return; } const fd = new FormData(); fd.append('file', fileInput.files[0]); await authFetch(`/api/bots/${bot}/kb/files`, { method: 'POST', body: fd }); fileInput.value = ''; loadKbData(); }
+        async function deleteKbFile(fileId) { const bot = document.getElementById('kbBotSelect').value; if (!confirm('Delete file?')) return; await authFetch(`/api/bots/${bot}/kb/files/${fileId}`, { method: 'DELETE' }); loadKbData(); }
+
+        let ws = null;
+        function connectSocket() {
+            if (ws) { ws.close(); }
+            ws = new WebSocket(`ws://localhost:8081/chat`);
+            ws.onopen = () => console.log('✅ socket open');
+            ws.onclose = () => console.log('❌ socket closed');
+            ws.onerror = e => console.error('socket error', e);
+            ws.onmessage = e => {
+                const msg = JSON.parse(e.data);
+                if (msg.conversationId) conversationId = msg.conversationId;
+                appendChat(msg.role || 'bot', msg.message);
+            };
+        }
+        function appendChat(sender, text) {
+            const box = document.getElementById('chatBox');
+            const div = document.createElement('div');
+            div.style.margin = '4px 0';
+            div.innerHTML = `<b>${sender}:</b> ${text}`;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+        function sendMsg() {
+            const botId = document.getElementById('chatBotSelect').value;
+            const val = document.getElementById('chatInput').value.trim();
+            if (!botId) { alert('pick a bot first'); return; }
+            if (!val) return;
+            const payload = { botId, conversationId: conversationId, message: val }; // client sets convId if you store it
+            ws.send(JSON.stringify(payload));
+            appendChat('you', val);
+            document.getElementById('chatInput').value = '';
+        }
+
+        let apiConversationId = null;
+
+        function appendApiChat(sender, text) {
+            const box = document.getElementById('apiChatBox');
+            const div = document.createElement('div');
+            div.style.margin = '4px 0';
+            div.innerHTML = `<b>${sender}:</b> ${text}`;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function sendApiMsg(textOverride){
+    const botId   = document.getElementById('apiChatBotSelect').value;
+    const message = textOverride ?? document.getElementById('apiChatInput').value.trim();
+    if(!botId){ alert('Please select a bot'); return; }
+    if(!message) return;
+
+    if(!textOverride){           // only clear UI if user typed
+        appendApiChat('you', message);
+        document.getElementById('apiChatInput').value='';
     }
-});
 
-
-document.getElementById('chatInput').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault(); // prevent newline in input
-        sendMsg();
-    }
-});
-
-/* ------ BASIC HELPERS ------ */
-function showTab(tabId){
-    document.querySelectorAll('nav button').forEach(btn=>btn.classList.remove('active'));
-    document.getElementById('tabBtn-'+tabId.replace('Tab','')).classList.add('active');
-    document.querySelectorAll('.tab').forEach(t=>t.style.display='none');
-    document.getElementById(tabId).style.display='block';
-    if(tabId==='botsTab')loadBots();
-    if(tabId==='kbTab')loadKbData();
-	
-}
-function openBotModal(bot){
-    document.getElementById('botModal').style.display='flex';
-    if(bot){
-        editMode=true;
-        currentBot = bot;
-        document.getElementById('botModalTitle').textContent='Edit Bot';
-        document.getElementById('botNameInput').value=bot.botName;
-        document.getElementById('botNameInput').disabled=true; // id immutable
-        document.getElementById('botDescInput').value=bot.botDescription;
-    }else{
-        editMode=false;
-        currentBot=null;
-        document.getElementById('botModalTitle').textContent='New Bot';
-        document.getElementById('botNameInput').disabled=false;
-        document.getElementById('botNameInput').value='';
-        document.getElementById('botDescInput').value='';
-    }
-}
-function closeBotModal(){document.getElementById('botModal').style.display='none'}
-function openToolModal(tool){
-    if(!document.getElementById('toolsBotSelect').value){alert('Select a bot first');return;}
-    document.getElementById('toolModal').style.display='flex';
-    if(tool){
-        currentTool=tool;
-        editMode=true;
-        document.getElementById('toolModalTitle').textContent='Edit Tool';
-        document.getElementById('toolNameInput').value=tool.toolName;
-        document.getElementById('toolNameInput').disabled=true;
-        document.getElementById('toolDescInput').value=tool.description||'';
-        document.getElementById('toolUrlInput').value=tool.serverUrl||'';
-        document.getElementById('toolHeadersInput').value=JSON.stringify(tool.headers||{},null,2);
-        document.getElementById('toolParamsInput').value=JSON.stringify(tool.parameters||{},null,2);
-        document.getElementById('toolBodyInput').value=JSON.stringify(tool.requestBody||{},null,2);
-        document.getElementById('toolBeforeInput').value=tool.beforeTool||'';
-        document.getElementById('toolAfterInput').value=tool.afterTool||'';
-    }else{
-        editMode=false;
-        currentTool=null;
-        document.getElementById('toolModalTitle').textContent='New Tool';
-        document.querySelectorAll('#toolModal input, #toolModal textarea').forEach(el=>{el.disabled=false;el.value=''});
-    }
-}
-function closeToolModal(){document.getElementById('toolModal').style.display='none'}
-
-/* ------ BOTS ------ */
-async function loadBots(){
-    const res = await authFetch('/api/bots');
-    bots = await res.json();
-    const tbody = document.querySelector('#botsTable tbody');
-    tbody.innerHTML='';
-    bots.forEach(b=>{
-        const tr=document.createElement('tr');
-        tr.innerHTML=`<td>${b.botName}</td><td>${b.botDescription||''}</td><td class="actions"></td>`;
-        const actions=tr.querySelector('.actions');
-        const editBtn=document.createElement('button');editBtn.textContent='✏️ Edit';editBtn.onclick=()=>openBotModal(b);
-        const delBtn=document.createElement('button');delBtn.textContent='🗑️';delBtn.className='danger';delBtn.onclick=()=>deleteBot(b.botName);
-        actions.append(editBtn,delBtn);
-        tbody.appendChild(tr);
+    const payload = { botId, message, conversationId: apiConversationId || "start" };
+    const res     = await authFetch('/api/rag/chat',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload)
     });
-    // Refresh dropdowns
-    fillBotDropdown('llmBotSelect');
-    fillBotDropdown('promptBotSelect');
-    fillBotDropdown('toolsBotSelect');
-    fillBotDropdown('kbBotSelect');
-    fillBotDropdown('chatBotSelect');
-	fillBotDropdown('apiChatBotSelect');
-	fillBotDropdown('uiBotSelect');
-}
-async function saveBot(){
-    const name=document.getElementById('botNameInput').value.trim();
-    const desc=document.getElementById('botDescInput').value.trim();
-    if(!name){alert('Name required');return;}
-    const dto={botName:name,botDescription:desc};
-    const opts={headers:{'Content-Type':'application/json'},body:JSON.stringify(dto)};
-    if(editMode){
-        await authFetch(`/api/bots/${name}`,{method:'PUT',...opts});
-    }else{
-        await authFetch(`/api/bots`,{method:'POST',...opts});
-    }
-    closeBotModal();
-    loadBots();
-}
-async function deleteBot(name){
-    if(!confirm(`Delete bot "${name}"?`))return;
-    await authFetch(`/api/bots/${name}`,{method:'DELETE'});
-    loadBots();
-}
-
-/* ------ LLM CONFIG ------ */
-function fillBotDropdown(id){
-    const sel=document.getElementById(id);
-    const current=sel.value;
-    sel.innerHTML='<option value="">-- choose --</option>';
-    bots.forEach(b=>{
-        const opt=document.createElement('option');opt.value=b.botName;opt.textContent=b.botName;sel.appendChild(opt);
-    });
-    if(current) sel.value=current; // keep selection if possible
-}
-async function loadLlmConfig(){
-    const botId=document.getElementById('llmBotSelect').value;
-    const formWrap=document.getElementById('llmFormWrapper');
-    if(!botId){formWrap.style.display='none';return;}
-    const res=await authFetch(`/api/llm-configs/${botId}`);
-    if(res.ok){
-        const cfg=await res.json();
-        document.getElementById('llmModel').value=cfg.model||'';
-        document.getElementById('llmTemp').value=cfg.temperature||0.0;
-        document.getElementById('llmMax').value=cfg.maxTokens||0;
-    }else{
-        document.getElementById('llmModel').value='';
-        document.getElementById('llmTemp').value='';
-        document.getElementById('llmMax').value='';
-    }
-    formWrap.style.display='block';
-}
-async function saveLlm(){
-    const botId=document.getElementById('llmBotSelect').value;
-    const dto={botId:botId,model:document.getElementById('llmModel').value.trim(),temperature:parseFloat(document.getElementById('llmTemp').value),maxTokens:parseInt(document.getElementById('llmMax').value)};
-    const res=await authFetch(`/api/llm-configs/${botId}`);
-    const method=res.ok?'PUT':'POST';
-    await authFetch(`/api/llm-configs`+(method==='PUT'?`/${botId}`:''),{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(dto)});
-    alert('Saved');
-}
-async function deleteLlm(){
-    const botId=document.getElementById('llmBotSelect').value;
-    if(!confirm('Delete LLM config?'))return;
-    await authFetch(`/api/llm-configs/${botId}`,{method:'DELETE'});
-    loadLlmConfig();
-}
-
-/* ------ PROMPT CONFIG ------ */
-async function loadPromptConfig(){
-    const botId=document.getElementById('promptBotSelect').value;
-    const wrap=document.getElementById('promptFormWrapper');
-    if(!botId){wrap.style.display='none';return;}
-    const res=await authFetch(`/api/prompt-configs/${botId}`);
-    if(res.ok){
-        const cfg=await res.json();
-        document.getElementById('promptRole').value=cfg.role||'';
-        document.getElementById('promptSys').value=cfg.systemPrompt||'';
-        document.getElementById('promptFirst').value=cfg.firstMessage||'';
-    }else{
-        document.getElementById('promptRole').value='';
-        document.getElementById('promptSys').value='';
-        document.getElementById('promptFirst').value='';
-    }
-    wrap.style.display='block';
-}
-async function savePrompt(){
-    const botId=document.getElementById('promptBotSelect').value;
-    const dto={botId,role:document.getElementById('promptRole').value.trim(),systemPrompt:document.getElementById('promptSys').value.trim(),firstMessage:document.getElementById('promptFirst').value.trim()};
-    const res=await authFetch(`/api/prompt-configs/${botId}`);
-    const method=res.ok?'PUT':'POST';
-    await authFetch(`/api/prompt-configs`+(method==='PUT'?`/${botId}`:''),{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(dto)});
-    alert('Saved');
-}
-async function deletePrompt(){
-    const botId=document.getElementById('promptBotSelect').value;
-    if(!confirm('Delete prompt config?'))return;
-    await authFetch(`/api/prompt-configs/${botId}`,{method:'DELETE'});
-    loadPromptConfig();
-}
-
-/* ------ TOOLS ------ */
-async function loadToolsTable(){
-    const botName=document.getElementById('toolsBotSelect').value;
-    document.getElementById('selectedBotTitle').textContent=botName?`Bot: ${botName}`:'';
-    const tbody=document.querySelector('#toolsTable tbody');
-    tbody.innerHTML='';
-    if(!botName)return;
-    const res=await authFetch(`/api/bots/${botName}/tools`);
-    if(!res.ok)return;
-    const tools=await res.json();
-    tools.forEach(t=>{
-        const tr=document.createElement('tr');
-        tr.innerHTML=`<td>${t.toolName}</td><td>${t.description||''}</td><td>${t.serverUrl||''}</td><td class="actions"></td>`;
-        const actions=tr.querySelector('.actions');
-        const edit=document.createElement('button');edit.textContent='✏️';edit.onclick=()=>openToolModal(t);
-        const del=document.createElement('button');del.textContent='🗑️';del.className='danger';del.onclick=()=>deleteTool(t.toolName);
-        actions.append(edit,del);
-        tbody.appendChild(tr);
-    });
-}
-async function saveTool(){
-    const botName=document.getElementById('toolsBotSelect').value;
-    const name=document.getElementById('toolNameInput').value.trim();
-    if(!name){alert('Tool name required');return;}
-    const dto={
-        toolName:name,
-        description:document.getElementById('toolDescInput').value.trim(),
-        serverUrl:document.getElementById('toolUrlInput').value.trim(),
-        headers:jsonField('toolHeadersInput'),
-        parameters:jsonField('toolParamsInput'),
-        requestBody:jsonField('toolBodyInput'),
-        beforeTool:document.getElementById('toolBeforeInput').value.trim(),
-        afterTool:document.getElementById('toolAfterInput').value.trim()
-    };
-    const res=await authFetch(`/api/bots/${botName}/tools/${name}`);
-    const method=res.ok?'PUT':'POST';
-    const endpoint=method==='POST'?`/api/bots/${botName}/tools`:`/api/bots/${botName}/tools/${name}`;
-    await authFetch(endpoint,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(dto)});
-    closeToolModal();
-    loadToolsTable();
-}
-async function deleteTool(name){
-    const botName=document.getElementById('toolsBotSelect').value;
-    if(!confirm('Delete tool?'))return;
-    await authFetch(`/api/bots/${botName}/tools/${name}`,{method:'DELETE'});
-    loadToolsTable();
-}
-function jsonField(id){
-    try{return JSON.parse(document.getElementById(id).value||'{}');}
-    catch(e){alert(id+' must be valid JSON');throw e;}
-}
-
-/* ---------- KNOWLEDGE BASE ---------- */
-async function loadKbData(){const bot=document.getElementById('kbBotSelect').value;document.getElementById('kbBotTitle').textContent=bot?`Bot: ${bot}`:'';const qtbody=document.querySelector('#qnaTable tbody');const ftbody=document.querySelector('#fileTable tbody');qtbody.innerHTML='';ftbody.innerHTML='';if(!bot)return;const res=await authFetch(`/api/bots/${bot}/kb`);if(!res.ok)return;const kb=await res.json(); // {qnas:[],fileDetails:[]}
-    // QnAs
-    kb.qnas.forEach((qna,idx)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${idx}</td><td>${qna.question}</td><td>${qna.answer}</td><td class='actions'></td>`;const actions=tr.querySelector('.actions');const e=document.createElement('button');e.textContent='✏️';e.onclick=()=>openQnaModal(qna,idx);const d=document.createElement('button');d.textContent='🗑️';d.className='danger';d.onclick=()=>deleteQna(idx);actions.append(e,d);qtbody.appendChild(tr);});
-    // Files
-    kb.fileDetails.forEach(fd=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${fd.fileName}</td><td class='actions'></td>`;const del=document.createElement('button');del.textContent='🗑️';del.className='danger';del.onclick=()=>deleteKbFile(fd.fileId);tr.querySelector('.actions').append(del);ftbody.appendChild(tr);});
-}
-function openQnaModal(qna,index){document.getElementById('qnaModal').style.display='flex';if(qna){editMode=true;currentQnaIndex=index;document.getElementById('qnaModalTitle').textContent='Edit QnA';document.getElementById('qnaQuestion').value=qna.question;document.getElementById('qnaAnswer').value=qna.answer;}else{editMode=false;currentQnaIndex=null;document.getElementById('qnaModalTitle').textContent='New QnA';document.getElementById('qnaQuestion').value='';document.getElementById('qnaAnswer').value='';}}
-function closeQnaModal(){document.getElementById('qnaModal').style.display='none'}
-async function saveQna(){const bot=document.getElementById('kbBotSelect').value;if(!bot){alert('Select bot');return;}const q=document.getElementById('qnaQuestion').value.trim();const a=document.getElementById('qnaAnswer').value.trim();if(!q||!a){alert('Both question and answer required');return;}const dto={question:q,answer:a};const headers={'Content-Type':'application/json'};if(editMode){await authFetch(`/api/bots/${bot}/kb/qnas/${currentQnaIndex}`,{method:'PUT',headers,body:JSON.stringify(dto)});}else{await authFetch(`/api/bots/${bot}/kb/qnas`,{method:'POST',headers,body:JSON.stringify(dto)});}closeQnaModal();loadKbData();}
-async function deleteQna(idx){const bot=document.getElementById('kbBotSelect').value;if(!confirm('Delete QnA?'))return;await authFetch(`/api/bots/${bot}/kb/qnas/${idx}`,{method:'DELETE'});loadKbData();}
-async function uploadKbFile(){const bot=document.getElementById('kbBotSelect').value;const fileInput=document.getElementById('kbFileInput');if(!bot||!fileInput.files.length){alert('Select bot and choose file');return;}const fd=new FormData();fd.append('file',fileInput.files[0]);await authFetch(`/api/bots/${bot}/kb/files`,{method:'POST',body:fd});fileInput.value='';loadKbData();}
-async function deleteKbFile(fileId){const bot=document.getElementById('kbBotSelect').value;if(!confirm('Delete file?'))return;await authFetch(`/api/bots/${bot}/kb/files/${fileId}`,{method:'DELETE'});loadKbData();}
-
-let ws=null;
-function connectSocket(){
-   if(ws){ws.close();}
-   ws = new WebSocket(`ws://localhost:8081/chat`);
-   ws.onopen   = ()=>console.log('✅ socket open');
-   ws.onclose  = ()=>console.log('❌ socket closed');
-   ws.onerror  = e =>console.error('socket error',e);
-   ws.onmessage= e =>{
-    const msg = JSON.parse(e.data); 
-    if (msg.conversationId) conversationId = msg.conversationId;
-    appendChat(msg.role || 'bot', msg.message);
-   };
-}
-function appendChat(sender,text){
-   const box=document.getElementById('chatBox');
-   const div=document.createElement('div');
-   div.style.margin='4px 0';
-   div.innerHTML=`<b>${sender}:</b> ${text}`;
-   box.appendChild(div);
-   box.scrollTop=box.scrollHeight;
-}
-function sendMsg(){
-   const botId=document.getElementById('chatBotSelect').value;
-   const val = document.getElementById('chatInput').value.trim();
-   if(!botId){alert('pick a bot first');return;}
-   if(!val) return;
-   const payload={botId,conversationId:conversationId,message:val}; // client sets convId if you store it
-   ws.send(JSON.stringify(payload));
-   appendChat('you',val);
-   document.getElementById('chatInput').value='';
-}
-
-let apiConversationId = null;
-
-function appendApiChat(sender, text) {
-    const box = document.getElementById('apiChatBox');
-    const div = document.createElement('div');
-    div.style.margin = '4px 0';
-    div.innerHTML = `<b>${sender}:</b> ${text}`;
-    box.appendChild(div);
-    box.scrollTop = box.scrollHeight;
-}
-
-async function sendApiMsg() {
-    const botId = document.getElementById('apiChatBotSelect').value;
-    const message = document.getElementById('apiChatInput').value.trim();
-    if (!botId) { alert('Please select a bot'); return; }
-    if (!message) return;
-
-    appendApiChat('you', message);
-    document.getElementById('apiChatInput').value = '';
-
-    const payload = {
-        botId: botId,
-        message: message,
-        conversationId: apiConversationId || "start"
-    };
-
-    const res = await authFetch('/api/rag/chat', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(payload)
-    });
-
     const json = await res.json();
-    if (json.conversationId) apiConversationId = json.conversationId;
+    if(json.conversationId) apiConversationId = json.conversationId;
 
     appendApiChat('bot', json.message || '[no response]');
-}
 
-
-/* ------ UI CONFIG ------ */
-async function loadUiCfg(){
-    const bot = document.getElementById('uiBotSelect').value;
-    const wrap = document.getElementById('uiFormWrap');
-    if(!bot){wrap.style.display='none';return;}
-
-    const res = await authFetch(`/api/bots/botUiConfig/${bot}`);   // GET
-    const cfg = res.ok ? await res.json() : {};
-
-    document.getElementById('uiTheme').value   = cfg.themeColor    || '#0066ff';
-    document.getElementById('uiText').value    = cfg.textColor     || '#ffffff';
-    document.getElementById('uiFont').value    = cfg.textFont      || '';
-    document.getElementById('uiWelcome').value = cfg.welcomeMessage|| '';
-    document.getElementById('uiAvatarUrl').textContent = cfg.avatarUrl || '';
-
-    wrap.style.display = 'block';
-}
-
-async function saveUiCfg(){
-    const bot = document.getElementById('uiBotSelect').value;
-    if(!bot){alert('Pick a bot');return;}
-
-    const dto = {
-        themeColor     : document.getElementById('uiTheme').value,
-        textColor      : document.getElementById('uiText').value,
-        textFont       : document.getElementById('uiFont').value.trim(),
-        welcomeMessage : document.getElementById('uiWelcome').value.trim(),
-        avatarUrl      : document.getElementById('uiAvatarUrl').textContent.trim()
-    };
-
-    await authFetch(`/api/bots/updateTheme/${bot}`,{
-        method :'POST',
-        headers:{'Content-Type':'application/json'},
-        body   : JSON.stringify(dto)
-    });
-    alert('Saved');
-}
-
-function resetUiCfg(){ loadUiCfg(); }
-
-async function uploadAvatar(){
-    const bot = document.getElementById('uiBotSelect').value;
-    const inp = document.getElementById('uiAvatarInput');
-    if(!bot || !inp.files.length){alert('Pick file');return;}
-
-    const fd = new FormData();
-    fd.append('file', inp.files[0]);
-
-    const res = await authFetch(`/api/bots/${bot}/avatar`,{method:'POST',body:fd});
-    const url = await res.text();
-
-    document.getElementById('uiAvatarUrl').textContent = url;
-    inp.value = '';
-    alert('Uploaded');
+    // NEW – voice reply
+    if(voiceModeApi && json.audio)      playApiAudio(json.audio);
+    else if(voiceModeApi && json.message) speakApi(json.message);
 }
 
 
 
-window.addEventListener('load',connectSocket);
+        /* ------ UI CONFIG ------ */
+        async function loadUiCfg() {
+            const bot = document.getElementById('uiBotSelect').value;
+            const wrap = document.getElementById('uiFormWrap');
+            if (!bot) { wrap.style.display = 'none'; return; }
+
+            const res = await authFetch(`/api/bots/botUiConfig/${bot}`);   // GET
+            const cfg = res.ok ? await res.json() : {};
+
+            document.getElementById('uiTheme').value = cfg.themeColor || '#0066ff';
+            document.getElementById('uiText').value = cfg.textColor || '#ffffff';
+            document.getElementById('uiFont').value = cfg.textFont || '';
+            document.getElementById('uiWelcome').value = cfg.welcomeMessage || '';
+            document.getElementById('uiAvatarUrl').textContent = cfg.avatarUrl || '';
+
+            wrap.style.display = 'block';
+        }
+
+        async function saveUiCfg() {
+            const bot = document.getElementById('uiBotSelect').value;
+            if (!bot) { alert('Pick a bot'); return; }
+
+            const dto = {
+                themeColor: document.getElementById('uiTheme').value,
+                textColor: document.getElementById('uiText').value,
+                textFont: document.getElementById('uiFont').value.trim(),
+                welcomeMessage: document.getElementById('uiWelcome').value.trim(),
+                avatarUrl: document.getElementById('uiAvatarUrl').textContent.trim()
+            };
+
+            await authFetch(`/api/bots/updateTheme/${bot}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dto)
+            });
+            alert('Saved');
+        }
+
+        function resetUiCfg() { loadUiCfg(); }
+
+        async function uploadAvatar() {
+            const bot = document.getElementById('uiBotSelect').value;
+            const inp = document.getElementById('uiAvatarInput');
+            if (!bot || !inp.files.length) { alert('Pick file'); return; }
+
+            const fd = new FormData();
+            fd.append('file', inp.files[0]);
+
+            const res = await authFetch(`/api/bots/${bot}/avatar`, { method: 'POST', body: fd });
+            const url = await res.text();
+
+            document.getElementById('uiAvatarUrl').textContent = url;
+            inp.value = '';
+            alert('Uploaded');
+        }
 
 
 
-// ---------- INIT ----------
-loadBots();
-</script>
+        window.addEventListener('load', connectSocket);
+        
+
+        /* ===== AUDIO SUPPORT FOR API CHAT ===== */
+const API_AUDIO = {
+    ttsUrl : '/api/audio/tts',   // GET  ?text=...&voiceId=...
+    sttUrl : '/api/audio/stt',   // POST multipart file
+    voiceId: 'T5cu6IU92Krx4mh43osx'
+};
+
+let voiceModeApi  = false;
+let recApi, chunksApi = [], silenceTimerApi, analyserApi, audioCtxApi;
+const SILENCE_MS = 1000, THRESHOLD = 0.02;
+const apiPlayer  = document.getElementById('apiPlayer');
+const apiMicBtn  = document.getElementById('apiMicBtn');
+const apiSendBtn = document.getElementById('apiSendBtn');
+
+/* -- recording ----------------------------------------------------------- */
+function startApiRecording(){
+    navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
+        chunksApi = [];
+        recApi = new MediaRecorder(stream);
+        recApi.ondataavailable = e => chunksApi.push(e.data);
+        recApi.onstop = onApiRecordingStop;
+        recApi.start();
+
+        // silence detection
+        audioCtxApi = new (window.AudioContext||window.webkitAudioContext)();
+        const src   = audioCtxApi.createMediaStreamSource(stream);
+        analyserApi = audioCtxApi.createAnalyser();
+        src.connect(analyserApi);
+        const data  = new Uint8Array(analyserApi.fftSize);
+        let last    = Date.now();
+        silenceTimerApi = setInterval(()=>{
+            analyserApi.getByteTimeDomainData(data);
+            const norm = Math.max(...data)/128-1;
+            if(Math.abs(norm) > THRESHOLD) last = Date.now();
+            if(Date.now()-last > SILENCE_MS){
+                clearInterval(silenceTimerApi);
+                recApi.stop();
+                stream.getTracks().forEach(t=>t.stop());
+                audioCtxApi && audioCtxApi.close();
+            }
+        },200);
+    }).catch(console.error);
+}
+
+async function onApiRecordingStop(){
+    const blob = new Blob(chunksApi,{type:'audio/webm'});
+    if(blob.size < 1000){ if(voiceModeApi) startApiRecording(); return; }
+    const fd = new FormData(); fd.append('file',blob,'speech.webm');
+    try{
+        const r = await authFetch(API_AUDIO.sttUrl,{method:'POST',body:fd});
+        if(!r.ok) throw new Error('STT '+r.status);
+        const {text} = await r.json();
+        
+        if(text){
+            appendApiChat('you', text);
+            sendApiMsg(text); 
+        }         // feed straight into chat
+    }catch(e){ console.error('STT error',e); }
+}
+
+/* -- playback / TTS ------------------------------------------------------ */
+async function speakApi(text){
+    try{
+        const url = `${API_AUDIO.ttsUrl}?text=${encodeURIComponent(text)}&voiceId=${API_AUDIO.voiceId}`;
+        const res = await authFetch(url);
+        if(!res.ok) throw new Error('TTS '+res.status);
+        apiPlayer.src = URL.createObjectURL(await res.blob());
+        await apiPlayer.play();
+    }catch(e){ console.error('TTS error',e); }
+}
+
+function playApiAudio(base64){
+    apiPlayer.src = base64.startsWith('data:')
+        ? base64
+        : `data:audio/mpeg;base64,${base64}`;
+    apiPlayer.play();
+}
+
+/* -- UI hooks ------------------------------------------------------------ */
+function toggleApiMic(){
+    voiceModeApi = !voiceModeApi;
+    apiMicBtn.textContent = voiceModeApi ? '⏹' : '🎤';
+    if(voiceModeApi) startApiRecording();
+    else{
+        recApi && recApi.state === 'recording' && recApi.stop();
+        clearInterval(silenceTimerApi);
+    }
+}
+
+apiMicBtn .onclick = toggleApiMic;
+apiSendBtn.onclick = ()=>sendApiMsg();   // same handler for click & Enter
+apiPlayer.addEventListener('ended',()=>{
+    if(voiceModeApi) startApiRecording();
+});
+
+
+
+        // ---------- INIT ----------
+        loadBots();
+    </script>
 </body>
+
 </html>

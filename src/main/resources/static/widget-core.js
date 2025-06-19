@@ -11,7 +11,8 @@
     botAvatar: "",
     // NEW: backend endpoints for audio
     ttsUrl: "/api/audio/tts",          // GET  text=<msg>
-    sttUrl: "/api/audio/stt"            // POST multipart file
+    sttUrl: "/api/audio/stt",            // POST multipart file,
+    voiceId: "T5cu6IU92Krx4mh43osx"
   };
 
   /* ===== 2. CSS (unchanged except fonts) ===== */
@@ -124,7 +125,7 @@
   /* ===== 6. AUDIO (backend) ===== */
   async function speak(text) {
     try {
-      const url = `${cfg.ttsUrl}?text=${encodeURIComponent(text)}`;
+      const url = `${cfg.ttsUrl}?text=${encodeURIComponent(text)}&voiceId=${cfg.voiceId}`;
       const res = await fetch(url, { method: "GET" });
       if (!res.ok) throw new Error(`TTS HTTP ${res.status}`);
       const audioBlob = await res.blob();

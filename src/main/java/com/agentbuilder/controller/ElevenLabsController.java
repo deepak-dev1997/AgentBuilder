@@ -23,11 +23,11 @@ public class ElevenLabsController {
 	private ElevenLabsService elevenLabsService;
 	
 	@GetMapping(value = "/tts", produces = "audio/mpeg")
-    public byte[] tts(@RequestParam String text) {
-        return elevenLabsService.tts(text);
+    public byte[] tts(@RequestParam String text,@RequestParam String voiceId) {
+        return elevenLabsService.tts(text,voiceId);
     }
 
-    /* --- voice → text --- */
+
     @PostMapping("/stt")
     public Map<String,String> stt(@RequestPart MultipartFile file) {
         return Map.of("text", elevenLabsService.stt(file));

@@ -52,7 +52,8 @@ public class WidgetController {
 	            welcomeMessage: "%s",
 	            apiUrl:"%s",
 	            ttsUrl: "%s",
-	            sttUrl: "%s"
+	            sttUrl: "%s",
+	            voiceId: "%s"
 	          };
 	          var s = document.createElement('script');
 	          s.src = '%s/widget-core.js';
@@ -70,6 +71,7 @@ public class WidgetController {
 	           baseUrl+"/api/rag/chat",
 	           baseUrl+"/api/audio/tts",
 	           baseUrl+"/api/audio/stt",
+	           cfg.getVoiceId(),
 	           baseUrl
 	        );
 

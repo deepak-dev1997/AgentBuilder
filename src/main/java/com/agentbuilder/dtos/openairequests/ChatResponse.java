@@ -12,4 +12,5 @@ public class ChatResponse {
 
     private String response;
     private String audio;
+    private String voiceId;
 }
